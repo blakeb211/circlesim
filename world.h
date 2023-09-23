@@ -14,7 +14,7 @@ public:
     }
   };
   World() = delete;
-  World(int id) : DIMX{50} {
+  World(int id) : DIMX{25} {
     switch (id) {
     case 42:
       // create hero character first
@@ -42,11 +42,11 @@ public:
     // is less than 0.5, the location is occupied.
     {
       v2 dR{};
-      float mag2{};
       for (auto o : objs) {
         dR = o->pos - pos;
-        mag2 = dR.mag2();
-        if (mag2 < 0.5) {
+        dR.x = std::abs(dR.x);
+        dR.y = std::abs(dR.y);
+        if (dR.x < 1 && dR.y < 1) {
           return false;
         }
       }

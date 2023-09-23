@@ -100,7 +100,7 @@ public:
 
 int main() {
   Example demo;
-  if (demo.Construct(512, 480, 4, 4,false,true))
+  if (demo.Construct(512, 480, 4, 4,false,false))
     demo.Start();
   return 0;
 }

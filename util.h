@@ -14,11 +14,10 @@ static bool time_to_cleanup{false};
 #define PI 3.14159265
 #define RAD2DEG 180. / PI
 #define DEG2RAD PI / 180.
-#define UPDATE_INTERVAL 0.1
+#define UPDATE_INTERVAL 0.3
 
 static inline float angle_from_two_pos(v2 before, v2 after) {
     v2 dir = after - before;
-    dir = dir.norm();
     return atan2(dir.y,dir.x);
 }
 

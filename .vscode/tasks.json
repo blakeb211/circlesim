@@ -16,7 +16,7 @@
 				"-Wno-nested-anon-types",
 				"-g",
 				"-march=native",
-				"-O0",
+				"-O2",
 				"actor.cpp",
 				"circlesim.cpp",
 				"-o",
