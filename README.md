@@ -1,6 +1,7 @@
 # 2d game to go inside of larger 3d viewer
-* add spatial data structure so we can do neighbor analysis (types)
-* add different sized entities
+* add rotation for different sized entities
+* add spatial data structure so we can have states that favor neighbor related behaviors 
+* put colors in a config file
 * add multiple worlds with different initializations and toggle active world
 * connect to 3d program
 
@@ -11,4 +12,5 @@
 * objects constrained to unit grid (pos_valid validates position)
 
 # done
+* add different sized entities
 * add state-based movement and hero movement

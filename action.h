@@ -30,9 +30,17 @@ class MoveAction : public Action {
     void execute() override{
         auto new_pos = a_->pos + offset_;
         auto new_ang = angle_from_two_pos(a_->pos, new_pos);
+        auto sz_periph = a_->periph.size();
         if (w_->pos_valid(new_pos)) {
+            // If object has any, check if perhipheral segments are valid positions too
+            for(int i = 0; i < sz_periph; i++)  {
+                if (a_->visible[i]) {
+                    if (!w_->pos_valid(a_->periph[i] + new_pos))
+                    return;
+                }
+            }
             a_->pos = new_pos;
-            a_->rot = new_ang; // hero currently doesn't have a visual angle indicator
+            a_->rot = new_ang; // have to decide on point of rotation 
         }
     }
 };

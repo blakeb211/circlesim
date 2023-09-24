@@ -28,6 +28,7 @@ enum class Shape {
   CIRC = 0,
   TRI = 1,
   QUAD = 2,
+  THREEHAT = 3,
 };
 
 class Actor {
@@ -38,7 +39,10 @@ public:
     delete(state);
   }
 }
-  v2 pos;
+  v2 pos; // center of item in absolute unit dimensions 
+  // invariant: pos.size() == visible.size()
+  std::vector<v2> periph;      // non center segments in coords relative to center
+  std::vector<bool> visible; // this changes based on whether parts of actor are dead (or compressed, depending on you think about it) or not
   float rot;
   Shape shape;
   Actor() = delete;

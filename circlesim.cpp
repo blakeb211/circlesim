@@ -44,15 +44,28 @@ class Example : public olc::PixelGameEngine {
       auto radius = 3;
       v2i facing = v2i{static_cast<int>(radius * cos(o->rot)),
                        static_cast<int>(radius * sin(o->rot))};
+      // To make actors with multiple pieces easier to draw
+      const auto &perhip = o->periph;
+      auto sz = perhip.size();
       switch (o->shape) {
       case Shape::CIRC:
-        DrawCircle(v2i{static_cast<int>(x), static_cast<int>(y)}, radius,
+        FillCircle(v2i{static_cast<int>(x), static_cast<int>(y)}, radius,
                    olc::BLUE);
         Draw(facing.x + x, facing.y + y, olc::RED);
         break;
       case Shape::QUAD:
-        DrawRect(v2i{static_cast<int>(x - 3), static_cast<int>(y - 3)},
-                 v2i{6, 6}, olc::DARK_MAGENTA);
+        DrawRect(
+            v2i{static_cast<int>(x - radius), static_cast<int>(y - radius)},
+            v2i{radius * 2, radius * 2}, olc::MAGENTA);
+        break;
+      case Shape::THREEHAT:
+        FillCircle(v2i{static_cast<int>(x), static_cast<int>(y)}, radius,
+                   olc::DARK_GREEN);
+        Draw(v2i{static_cast<int>(x), static_cast<int>(y)});
+        for (int i = 0; i < sz; i++)
+          FillCircle(v2i{static_cast<int>(x + perhip[i].x*xspace),
+                         static_cast<int>(y + perhip[i].y*yspace)},
+                     radius, olc::DARK_GREEN);
         break;
       case Shape::TRI:
         Draw(v2i{static_cast<int>(x), static_cast<int>(y)});
