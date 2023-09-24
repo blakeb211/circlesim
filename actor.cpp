@@ -1,35 +1,34 @@
 #include "actor.h"
 #include "world.h"
-
+#include "action.h"
 State *RandomMoveState::handle_input() { return this; }
 
-void RandomMoveState::update(Actor *o, World *w, float dt) {
+Action* RandomMoveState::update(Actor *o, World *w, float dt) {
   // dt in seconds
-  float accumulated{0.f};
   if (params.find("timer") != params.end()) {
-    accumulated = params["timer"] + dt;
-    params["timer"] = accumulated;
+    params["timer"] = params["timer"] + dt;
   } else {
     // set initially to zero
-    params["timer"] = accumulated;
+    params["timer"] = 0.f;
   }
 
-  if (accumulated >= UPDATE_INTERVAL) {
+  if (params["timer"] >= UPDATE_INTERVAL) {
     params["timer"] -= UPDATE_INTERVAL;
-    auto new_pos = o->pos + v2{static_cast<float>(rand() % 2), static_cast<float>(rand() % 3)};
+    v2 offset{static_cast<float>(rand() % 2), static_cast<float>(rand() % 3)};
+    auto new_pos = o->pos + offset;
     auto new_ang = angle_from_two_pos(o->pos, new_pos);
-    // try to move and if it is a bad move try reseting to corner
+    // Try to move and if it is a bad move try moving to 0,0. 
+    // Else, do not move.
     if (w->pos_valid(new_pos)) {
-      o->pos = new_pos;
-      o->rot = new_ang;
+      return new MoveAction(o, w, offset, new_ang);
     } else {
       auto new_pos2 = v2{0, 0};
       if (w->pos_valid(new_pos2)) {
-        o->pos = new_pos2;
-        o->rot = new_ang;
+      return new MoveAction(o, w, new_pos2 - o->pos, new_ang);
       }
     }
   }
+  return nullptr;
 }
 
 Actor::Actor(v2 pos, float rot, State * initial_state, Shape shape) {
@@ -39,10 +38,13 @@ Actor::Actor(v2 pos, float rot, State * initial_state, Shape shape) {
   this->shape = shape;
 }
 
-void Actor::update(World *w, float dt) {
+auto Actor::update(World *w, float dt) -> Action* {
   if (state == NULL) {
     // do update
+    return nullptr;
   } else {
-    state->update(this, w, dt);
+    return state->update(this, w, dt);
   }
+  assert(0); // should be unreachable
+  return nullptr;
 }

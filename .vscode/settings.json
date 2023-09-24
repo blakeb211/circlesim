@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.cc": "cpp",
+        "*.tcc": "cpp",
+        "__hash_table": "cpp"
+    }
+}

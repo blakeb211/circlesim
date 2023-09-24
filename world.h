@@ -7,6 +7,7 @@ class World {
   size_t DIMX;
 
 public:
+  std::string name{};
   size_t dimx() const { return DIMX; }
   ~World() {
     for (auto o : objs) {
@@ -38,8 +39,7 @@ public:
   };
   bool pos_valid(v2 pos) {
     // Check if cell is occupied already.
-    // We are on a unit grid so if the magnitude squared
-    // is less than 0.5, the location is occupied.
+    // We are on a unit grid.
     {
       v2 dR{};
       for (auto o : objs) {

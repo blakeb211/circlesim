@@ -17,7 +17,12 @@ class MoveAction : public Action {
     Actor * a_;
     v2 offset_;
     public:
-    MoveAction(Actor * a, World* w, v2 offset) {
+    /// @brief change position and/or rotation of actor
+    /// @param a actor pointer
+    /// @param w world pointer
+    /// @param offset  position offset
+    /// @param rot     new rotation (not an offset!)
+    MoveAction(Actor * a, World* w, v2 offset, float rot) {
        a_ = a; 
        w_ = w;
        offset_ = offset;

@@ -9,18 +9,19 @@ using v2i = olc::vi2d;
 
 class Actor; 
 class World;
+class Action;
 
 class State {
   public:
   std::unordered_map<const char *, float> params;
   virtual ~State() {};
   virtual State *handle_input() = 0; // for switching states
-  virtual void update(Actor * o, World * w, float dt) = 0;
+  virtual Action* update(Actor * o, World * w, float dt) = 0;
 };
 
 class RandomMoveState : public State {
 State * handle_input();
-void update(Actor * o, World * w, float dt);
+Action* update(Actor * o, World * w, float dt);
 };
 
 enum class Shape {
@@ -42,5 +43,5 @@ public:
   Shape shape;
   Actor() = delete;
   Actor(v2 pos, float rot, State * initial_state, Shape shape = Shape::CIRC);
-  void update(World *w, float dt);
+  Action * update(World *w, float dt);
 };
