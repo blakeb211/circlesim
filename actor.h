@@ -43,7 +43,7 @@ public:
   // invariant: pos.size() == visible.size()
   std::vector<v2> periph;      // non center segments in coords relative to center
   std::vector<bool> visible; // this changes based on whether parts of actor are dead (or compressed, depending on you think about it) or not
-  float rot;
+  float facing;
   Shape shape;
   Actor() = delete;
   Actor(v2 pos, float rot, State * initial_state, Shape shape = Shape::CIRC);

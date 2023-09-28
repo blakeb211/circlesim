@@ -13,16 +13,16 @@ class Example : public olc::PixelGameEngine {
     std::vector<Action *> ret;
     auto hero = active_w->objs[0];
     if (GetKey(olc::Key::LEFT).bPressed) {
-      ret.push_back(new MoveAction(hero, active_w, v2{-1, 0}, 0.f));
+      ret.push_back(new MoveAction(hero, active_w, v2{-1, 0}));
     }
     if (GetKey(olc::Key::RIGHT).bPressed) {
-      ret.push_back(new MoveAction(hero, active_w, v2{1, 0}, 0.f));
+      ret.push_back(new MoveAction(hero, active_w, v2{1, 0}));
     }
     if (GetKey(olc::Key::UP).bPressed) {
-      ret.push_back(new MoveAction(hero, active_w, v2{0, -1}, 0.f));
+      ret.push_back(new MoveAction(hero, active_w, v2{0, -1}));
     }
     if (GetKey(olc::Key::DOWN).bPressed) {
-      ret.push_back(new MoveAction(hero, active_w, v2{0, +1}, 0.f));
+      ret.push_back(new MoveAction(hero, active_w, v2{0, +1}));
     }
     if (GetKey(olc::Key::Q).bHeld) {
       ret.push_back(new QuitAction());
@@ -42,8 +42,8 @@ class Example : public olc::PixelGameEngine {
       float x = xoffset + o->pos.x * xspace;
       float y = yoffset + o->pos.y * yspace;
       auto radius = 3;
-      v2i facing = v2i{static_cast<int>(radius * cos(o->rot)),
-                       static_cast<int>(radius * sin(o->rot))};
+      v2i facing = v2i{static_cast<int>(radius * cos(o->facing)),
+                       static_cast<int>(radius * sin(o->facing))};
       // To make actors with multiple pieces easier to draw
       const auto &perhip = o->periph;
       auto sz = perhip.size();
@@ -62,10 +62,12 @@ class Example : public olc::PixelGameEngine {
         FillCircle(v2i{static_cast<int>(x), static_cast<int>(y)}, radius,
                    olc::DARK_GREEN);
         Draw(v2i{static_cast<int>(x), static_cast<int>(y)});
-        for (int i = 0; i < sz; i++)
-          FillCircle(v2i{static_cast<int>(x + perhip[i].x*xspace),
-                         static_cast<int>(y + perhip[i].y*yspace)},
-                     radius, olc::DARK_GREEN);
+        for (int i = 0; i < sz; i++) {
+          if (o->visible[i])
+            FillCircle(v2i{static_cast<int>(x + perhip[i].x * xspace),
+                           static_cast<int>(y + perhip[i].y * yspace)},
+                       radius, olc::DARK_GREEN);
+        }
         break;
       case Shape::TRI:
         Draw(v2i{static_cast<int>(x), static_cast<int>(y)});
@@ -115,7 +117,7 @@ public:
     Clear(olc::DARK_YELLOW);
     draw_world_2d(active_w);
 
-    if (time_to_cleanup) {
+    if (g_time_to_cleanup) {
       for (auto w : worlds) {
         w->~World();
       }
