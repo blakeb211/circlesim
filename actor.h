@@ -33,19 +33,23 @@ enum class Shape {
 
 class Actor {
   State *state{nullptr};
+  static int32_t actor_count;
+  int32_t id{-1};
 public:
 ~Actor() {
   if (state) {
     delete(state);
   }
 }
+int32_t get_id() const { return id; }
   v2 pos; // center of item in absolute unit dimensions 
-  // invariant: pos.size() == visible.size()
+  // invariant: periph.size() == visible.size()
   std::vector<v2> periph;      // non center segments in coords relative to center
-  std::vector<bool> visible; // this changes based on whether parts of actor are dead (or compressed, depending on you think about it) or not
+  std::vector<bool> visible;   // visibility of non-central elements
   float facing;
   Shape shape;
   Actor() = delete;
   Actor(v2 pos, float rot, State * initial_state, Shape shape = Shape::CIRC);
   Action * update(World *w, float dt);
 };
+

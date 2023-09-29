@@ -1,6 +1,10 @@
 #include "action.h"
 #include "actor.h"
 #include "world.h"
+
+
+int32_t Actor::actor_count = 0;
+
 auto RandomMoveState::handle_input() -> State * { return this; }
 
 auto RandomMoveState::update(Actor *a, World *w, float dt) -> Action * {
@@ -34,6 +38,7 @@ auto RandomMoveState::update(Actor *a, World *w, float dt) -> Action * {
 }
 
 Actor::Actor(v2 pos, float rot, State *initial_state, Shape shape) {
+  this->id = actor_count++;
   this->pos = pos;
   this->facing = rot;
   this->state = initial_state;
