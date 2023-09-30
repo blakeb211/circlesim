@@ -2,6 +2,7 @@
 #include "actor.h"
 #include "util.h"
 #include "world.h"
+#include "olcPixelGameEngine.h"
 
 class Actor;
 
@@ -17,11 +18,11 @@ class MoveAction : public Action {
   v2 _offset;
 
 public:
+  MoveAction() = delete;
   /// @brief change position and/or rotation of actor
   /// @param a actor pointer
   /// @param w world pointer
   /// @param offset  position offset
-  MoveAction() = delete;
   MoveAction(Actor *a, World *w, v2 offset) {
     _a = a;
     _w = w;
@@ -47,20 +48,34 @@ public:
         }
       }
       // realize the translation
+      World::remove_actor_occupancy(_a, _w);
       _a->pos = new_pos;
-      // add positons to the world occupation map
-      _w->occupation[v2i(static_cast<int>(_a->pos.x),
-                         static_cast<int>(_a->pos.y))] =
-          cell_context{_a->get_id(), _a->shape};
-
-      for (int i = 0; i < sz_periph; i++) {
-        const auto abs_loc = _a->periph[i] + _a->pos;
-        const auto x = static_cast<int>(abs_loc.x);
-        const auto y = static_cast<int>(abs_loc.y);
-        _w->occupation[v2i(x, y)] = cell_context{_a->get_id(), _a->shape};
-      }
+      World::add_actor_occupancy(_a, _w);
     }
   }
+};
+
+class PlotLabelAction : public Action {
+  public:
+  v2 pos;
+  int number_of_dots;
+  World * w;
+  PlotLabelAction(World * w, v2 pos, int number_of_dots) {
+    this->w = w;
+    this->number_of_dots = number_of_dots;
+    this->pos = pos;
+  }
+  void execute() {
+  }
+};
+
+class PauseGameAction : public Action {
+  PauseGameAction() {
+  
+  }
+  void execute() {
+  }
+
 };
 
 class RotateAction : public Action {
@@ -97,19 +112,9 @@ public:
 
     if (count_of_valid_moves == sz_periph) {
       // realize the rotation
+      World::remove_actor_occupancy(_a, _w);
       _a->periph = periph_copy;
-     
-      // add positons to the world occupation map
-      _w->occupation[v2i(static_cast<int>(center.x),
-                         static_cast<int>(center.y))] =
-          cell_context{_a->get_id(), _a->shape};
-
-      for (int i = 0; i < sz_periph; i++) {
-        const auto abs_loc = periph_copy[i] + _a->pos;
-        const auto x = static_cast<int>(abs_loc.x);
-        const auto y = static_cast<int>(abs_loc.y);
-        _w->occupation[v2i(x, y)] = cell_context{_a->get_id(), _a->shape};
-      }
+      World::add_actor_occupancy(_a, _w);
     }
   }
 };

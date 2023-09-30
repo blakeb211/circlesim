@@ -13,11 +13,11 @@ using v2 = olc::vf2d;
 using v2i = olc::vi2d;
 using rint_distr = std::uniform_int_distribution<int>;
 
-static bool g_time_to_cleanup{false};
+static bool g_time_to_cleanup{false}; // only used in main cpp file
 #define PI 3.14159265
 #define RAD2DEG 180. / PI
 #define DEG2RAD PI / 180.
-#define UPDATE_INTERVAL 0.1
+#define UPDATE_INTERVAL 1.0
 
 static inline float angle_from_two_pos(v2 before, v2 after) {
     v2 dir = after - before;

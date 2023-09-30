@@ -11,6 +11,7 @@ class Actor;
 class World;
 class Action;
 
+
 class State {
   public:
   std::unordered_map<const char *, float> params;
@@ -20,6 +21,11 @@ class State {
 };
 
 class RandomMoveState : public State {
+State * handle_input();
+Action* update(Actor * o, World * w, float dt);
+};
+
+class WantThreeHatNeighborsState : public State {
 State * handle_input();
 Action* update(Actor * o, World * w, float dt);
 };
@@ -36,6 +42,7 @@ class Actor {
   static int32_t actor_count;
   int32_t id{-1};
 public:
+  int neighbors{-1};
 ~Actor() {
   if (state) {
     delete(state);

@@ -8,7 +8,7 @@
 			"args": [
 				"-fcolor-diagnostics",
 				"-fansi-escape-codes",
-				"-std=c++14",
+				"-std=c++17",
 				"-Wall",
 				"-pedantic",
 				"-Wunused-variable",
@@ -16,7 +16,7 @@
 				"-Wno-nested-anon-types",
 				"-g",
 				"-march=native",
-				"-O1",
+				"-O0",
 				"actor.cpp",
 				"world.cpp",
 				"circlesim.cpp",

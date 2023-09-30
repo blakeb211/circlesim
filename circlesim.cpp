@@ -8,6 +8,7 @@
 class Example : public olc::PixelGameEngine {
   World *active_w;
   std::vector<World *> worlds;
+  bool paused{false};
 
   auto get_user_input() -> std::vector<Action *> {
     std::vector<Action *> ret;
@@ -72,6 +73,10 @@ class Example : public olc::PixelGameEngine {
       case Shape::TRI:
         Draw(v2i{static_cast<int>(x), static_cast<int>(y)});
         break;
+      };
+      // draw text labels
+      if (o->neighbors > -1) {
+        DrawString(x, y, std::to_string(o->neighbors));
       }
     }
   }
@@ -102,6 +107,14 @@ public:
   }
 
   bool OnUserUpdate(float fElapsedTime) override {
+    if (GetKey(olc::Key::P).bPressed) {
+      paused = !paused;
+    }
+    if (paused) {
+      return true;
+    } 
+    Clear(olc::VERY_DARK_RED);
+    draw_world_2d(active_w);
     // Called once per frame
     std::vector<Action *> user_actions = get_user_input();
     for (auto &a : user_actions) {
@@ -113,9 +126,6 @@ public:
       a->execute();
       delete (a);
     }
-
-    Clear(olc::DARK_YELLOW);
-    draw_world_2d(active_w);
 
     if (g_time_to_cleanup) {
       for (auto w : worlds) {

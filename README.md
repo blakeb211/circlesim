@@ -1,5 +1,5 @@
 # spatial notes
-* add static method for updating occupation - it is half written already just not pulled out into a function (have to remove the old positions too)
+* add states that use neighbors of
 
 # 2d game to go inside of larger 3d viewer
 * add spatial data structure so we can have states that favor neighbor related behaviors 
