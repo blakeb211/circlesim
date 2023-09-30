@@ -96,37 +96,22 @@ bool World::pos_falls_within_map(v2 pos) {
 }
 
 bool World::pos_valid(Actor *a, v2 pos) {
-  // @todo Update this to use the occupation map
   // We are on a unit grid.
   // Check if cell is occupied already.
   {
-    v2 dR{};
-    for (auto o : objs) {
-      // skip checking object for collision with itself
-      if (o == a)
-        continue;
-      dR = o->pos - pos;
-      dR.x = std::abs(dR.x);
-      dR.y = std::abs(dR.y);
-      if (dR.x < 1 && dR.y < 1) {
-        return false;
-      }
-      const auto sz_periph = o->periph.size();
-      for (int i = 0; i < sz_periph; i++) {
-        if (!o->visible[i])
-          continue;
-        dR = o->pos + o->periph[i] - pos;
-        dR.x = std::abs(dR.x);
-        dR.y = std::abs(dR.y);
-        if (dR.x < 1 && dR.y < 1) {
-          return false;
-        }
-      }
+    if (!pos_falls_within_map(pos)) {
+      return false;
+    }
+    v2i pos_int = v2i(std::round(pos.x),std::round(pos.y));
+    if (occupation.find(pos_int) == occupation.end()) {
+      return true;
+    }
+    CellContext tmp = occupation[pos_int];
+    if (tmp.id == a->get_id() || tmp == World::EMPTY_CELL_CONTEXT) {
+      return true;
     }
   }
-  // If we are here, no other actor blocks the move. Return whether it is
-  // in range of the grid or not.
-  return pos_falls_within_map(pos);
+    return false;
 }
 
 std::vector<CellContext> &World::neighbors_of(Actor *a) {

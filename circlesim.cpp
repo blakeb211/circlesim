@@ -114,7 +114,6 @@ public:
       return true;
     } 
     Clear(olc::VERY_DARK_RED);
-    draw_world_2d(active_w);
     // Called once per frame
     std::vector<Action *> user_actions = get_user_input();
     for (auto &a : user_actions) {
@@ -127,6 +126,7 @@ public:
       delete (a);
     }
 
+    draw_world_2d(active_w);
     if (g_time_to_cleanup) {
       for (auto w : worlds) {
         w->~World();
