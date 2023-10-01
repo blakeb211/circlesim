@@ -17,7 +17,7 @@ static bool g_time_to_cleanup{false}; // only used in main cpp file
 #define PI 3.14159265
 #define RAD2DEG 180. / PI
 #define DEG2RAD PI / 180.
-#define UPDATE_INTERVAL 0.05
+#define UPDATE_INTERVAL 0.2
 
 static inline float angle_from_two_pos(v2 before, v2 after) {
     v2 dir = after - before;

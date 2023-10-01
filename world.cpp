@@ -1,5 +1,5 @@
+#include "spatial_generator.h"
 #include "world.h"
-
 bool CellContext::operator==(const CellContext &c) const {
   return this->id == c.id && this->shape == c.shape;
 }
@@ -7,18 +7,19 @@ bool CellContext::operator!=(const CellContext &c) const {
   return this->id != c.id || this->shape != c.shape;
 }
 
-CellContext World::EMPTY_CELL_CONTEXT = CellContext{-1,Shape::QUAD};
+CellContext World::EMPTY_CELL_CONTEXT = CellContext{-1, Shape::QUAD};
 
 /// @brief remove actor segments from each cell it occupies
 /// @param a actor pointer
 /// @param w world pointer
+// Assumes position is valid in the world object already
 void World::remove_actor_occupancy(Actor const *const a, World *w) {
   // remove actor from cells it occupied in the world occupation map
   auto center = a->pos;
   auto sz_periph = a->periph.size();
 
   w->occupation[v2i(static_cast<int>(center.x), static_cast<int>(center.y))] =
-  World::EMPTY_CELL_CONTEXT;
+      World::EMPTY_CELL_CONTEXT;
 
   for (int i = 0; i < sz_periph; i++) {
     const auto abs_loc = a->periph[i] + center;
@@ -31,6 +32,7 @@ void World::remove_actor_occupancy(Actor const *const a, World *w) {
 /// @brief add actor segments to each cell it occupies now
 /// @param a actor pointer
 /// @param w world pointer
+// Assumes position is valid in the world obejct already
 void World::add_actor_occupancy(Actor const *const a, World *w) {
   // remove actor from cells it occupied before the move
   // add actor to cells it occupies now
@@ -58,9 +60,13 @@ World::~World() {
   std::cout << "World destructor finished\n";
 }
 
-World::World(int id) : DIMX{14} {
-  // @TODO set unorderded map capacity
-  auto my_rand = rint_distr(1, 100);
+World::World(int id, unsigned int dimx) {
+  // @TODO move world generation to its own header file
+  // @TODO make sure initial placement of object is a valid spot
+  Matrix walls = gen_world_bsp(dimx, 222);
+
+  DIMX = dimx;
+  auto my_rand = rint_distr(1, 200);
   switch (id) {
   case 42:
     // create hero character first
@@ -70,16 +76,31 @@ World::World(int id) : DIMX{14} {
 
     for (int x = 0; x < DIMX; x++) {
       for (int y = 0; y < DIMX; y++) {
+
         // sparse entity generation for this particular world
         float ang = -90 * DEG2RAD;
-        if (my_rand(generator) > 97) {
+
+        if (walls(x, y) == 1) {
+          objs.push_back(
+              new Actor(v2{static_cast<float>(x), static_cast<float>(y)}, ang,
+                        new UnmovableWallState{}, Shape::QUAD));
+          continue;
+        }
+
+        if (my_rand(generator) > 197) {
           objs.push_back(
               new Actor(v2{static_cast<float>(x), static_cast<float>(y)}, ang,
                         new WantThreeHatNeighborsState{}, Shape::CIRC));
-        } else if (my_rand(generator) == 1) {
+        }
+        if (my_rand(generator) == 1) {
           objs.push_back(
               new Actor(v2{static_cast<float>(x), static_cast<float>(y)}, ang,
                         new RandomMoveState{}, Shape::THREEHAT));
+        }
+        if (my_rand(generator) == 3) {
+          objs.push_back(
+              new Actor(v2{static_cast<float>(x), static_cast<float>(y)}, ang,
+                        new UnmovableWallState{}, Shape::QUAD));
         }
       } // y loop
     }   // x loop
@@ -102,7 +123,7 @@ bool World::pos_valid(Actor *a, v2 pos) {
     if (!pos_falls_within_map(pos)) {
       return false;
     }
-    v2i pos_int = v2i(std::round(pos.x),std::round(pos.y));
+    v2i pos_int = v2i(std::round(pos.x), std::round(pos.y));
     if (occupation.find(pos_int) == occupation.end()) {
       return true;
     }
@@ -111,7 +132,7 @@ bool World::pos_valid(Actor *a, v2 pos) {
       return true;
     }
   }
-    return false;
+  return false;
 }
 
 std::vector<CellContext> &World::neighbors_of(Actor *a) {
@@ -126,14 +147,14 @@ std::vector<CellContext> &World::neighbors_of(Actor *a) {
   std::set<v2i> pos_to_evaluate;
   // Collect positions adjacent to all the actors segments
   for (auto p : pos) {
-    pos_to_evaluate.insert(v2i(std::round(p.x),std::round(p.y)) + v2i{+1, +0});
-    pos_to_evaluate.insert(v2i(std::round(p.x),std::round(p.y)) + v2i{-1, +0});
-    pos_to_evaluate.insert(v2i(std::round(p.x),std::round(p.y)) + v2i{+1, +1});
-    pos_to_evaluate.insert(v2i(std::round(p.x),std::round(p.y)) + v2i{-1, -1});
-    pos_to_evaluate.insert(v2i(std::round(p.x),std::round(p.y)) + v2i{-1, +1});
-    pos_to_evaluate.insert(v2i(std::round(p.x),std::round(p.y)) + v2i{+1, -1});
-    pos_to_evaluate.insert(v2i(std::round(p.x),std::round(p.y)) + v2i{+0, +1});
-    pos_to_evaluate.insert(v2i(std::round(p.x),std::round(p.y)) + v2i{+0, -1});
+    pos_to_evaluate.insert(v2i(std::round(p.x), std::round(p.y)) + v2i{+1, +0});
+    pos_to_evaluate.insert(v2i(std::round(p.x), std::round(p.y)) + v2i{-1, +0});
+    pos_to_evaluate.insert(v2i(std::round(p.x), std::round(p.y)) + v2i{+1, +1});
+    pos_to_evaluate.insert(v2i(std::round(p.x), std::round(p.y)) + v2i{-1, -1});
+    pos_to_evaluate.insert(v2i(std::round(p.x), std::round(p.y)) + v2i{-1, +1});
+    pos_to_evaluate.insert(v2i(std::round(p.x), std::round(p.y)) + v2i{+1, -1});
+    pos_to_evaluate.insert(v2i(std::round(p.x), std::round(p.y)) + v2i{+0, +1});
+    pos_to_evaluate.insert(v2i(std::round(p.x), std::round(p.y)) + v2i{+0, -1});
   }
 
   // if exist in occupation and unequal to EMPTY_CELL, add to neighbor
@@ -142,7 +163,8 @@ std::vector<CellContext> &World::neighbors_of(Actor *a) {
     if (occupation.find(pp) != occupation.end()) { // exists in occupation
       CellContext tmp = occupation[pp];
       if (tmp != World::EMPTY_CELL_CONTEXT) { // not empty
-        if (tmp.id != a->get_id() && tmp.shape==Shape::THREEHAT) { // not just a piece of current actor
+        if (tmp.id != a->get_id() &&
+            tmp.shape == Shape::THREEHAT) { // not just a piece of current actor
           n.push_back(tmp);
         }
       }

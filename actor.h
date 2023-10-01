@@ -30,6 +30,11 @@ State * handle_input();
 Action* update(Actor * o, World * w, float dt);
 };
 
+class UnmovableWallState : public State {
+State * handle_input();
+Action* update(Actor * o, World * w, float dt);
+};
+
 enum class Shape {
   CIRC = 0,
   TRI = 1,

@@ -8,7 +8,7 @@
 			"args": [
 				"-fcolor-diagnostics",
 				"-fansi-escape-codes",
-				"-std=c++17",
+				"-std=c++14",
 				"-Wall",
 				"-pedantic",
 				"-Wunused-variable",

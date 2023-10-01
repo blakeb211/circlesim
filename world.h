@@ -41,7 +41,7 @@ public:
   size_t dimx() const;
   ~World();
   World() = delete;
-  World(int id);
+  World(int id, unsigned int dimx);
   bool pos_falls_within_map(v2 pos);
   bool pos_valid(Actor *a, v2 pos);
   std::vector<CellContext>& neighbors_of(Actor *a);

@@ -4,6 +4,10 @@
 
 int32_t Actor::actor_count = 0;
 
+auto UnmovableWallState::handle_input() -> State * { return this; }
+
+auto UnmovableWallState::update(Actor *a, World *w, float dt) -> Action * {return nullptr;};
+
 auto WantThreeHatNeighborsState::handle_input() -> State * { return this; }
 
 auto WantThreeHatNeighborsState::update(Actor *a, World *w, float dt) -> Action * { 

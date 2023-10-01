@@ -1,10 +1,9 @@
-# spatial notes
-* add states that use neighbors of
-
 # 2d game to go inside of larger 3d viewer
-* add spatial data structure so we can have states that favor neighbor related behaviors 
-* add a nonmovable state or use an object with no state if that will do that
-* improve world generation: starting config specified by matrix 
+* write world factory
+* register objects in occupation map as they are created
+* create 10 worlds
+* add a circling state
+* add a wrapping state
 * add multiple worlds with different initializations and toggle active world
 * write a 3d ui that interfaces with it 
 
@@ -16,6 +15,7 @@
 * update is driven by state if the actor has a state, otherwise the actor update method 
 
 # done
+* add spatial data structure so we can have states that favor neighbor related behaviors 
 * keep an updated map of position to cell_context (id, type, distance)
 * add rotation to move action; move facing var to a different action 
 * add different sized entities
