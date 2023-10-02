@@ -1,13 +1,14 @@
 # 2d game to go inside of larger 3d viewer
-* write world factory
-* register objects in occupation map as they are created
-* create 10 worlds
+* debug overlap of guys with walls 
 * add a circling state
 * add a wrapping state
 * add multiple worlds with different initializations and toggle active world
 * write a 3d ui that interfaces with it 
 
 # high level design
+* write world factory
+* register objects in occupation map as they are created
+* create 10 worlds
 * 3d ui will be separate thread with minimal interface
 * add additional classes derived from State to change actor behaviors
 * add additional classes derived from Action for user or ai actions 

@@ -32,7 +32,7 @@ Matrix gen_world_bsp(unsigned int dimx, unsigned int seed, bool invert) {
   auto res = Matrix(dimx, dimx);
   int rooms = 0;
 
-  while (rooms < clamp(static_cast<int>(dimx / 5), 2, 99)) {
+  while (rooms < clamp(seed % 20, 2, 99)) {
     rooms = rooms + 1;
     int x0 = 0;
     int y0 = 0;

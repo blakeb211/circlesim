@@ -67,7 +67,7 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
                                       float density, bool inverted) {
   // @TODO move world generation to its own header file
   // @TODO make sure initial placement of object is a valid spot
-  Matrix walls = gen_world_bsp(dimx, 42, inverted);
+  Matrix walls = gen_world_bsp(dimx, seed, inverted);
   World *w = new World(dimx);
   
   float ang = -90 * DEG2RAD;
@@ -85,7 +85,7 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
       if (walls(x, y) == 1) {
 
         Actor *new_obj =
-            new Actor(v2{static_cast<float>(x), static_cast<float>(y)}, ang,
+            new Actor(v2{float(x), float(y)}, ang,
                       new UnmovableWallState{}, Shape::QUAD);
 
         if (w->pos_valid_whole_actor(new_obj, v2(0, 0))) {
