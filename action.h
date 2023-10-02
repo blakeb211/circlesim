@@ -37,16 +37,7 @@ public:
     }
     // done with setting facing
 
-    auto sz_periph = _a->periph.size();
-    if (_w->pos_valid(_a, new_pos)) {
-      // If object has any, check if perhipheral segments are valid positions
-      // too
-      for (int i = 0; i < sz_periph; i++) {
-        if (_a->visible[i]) {
-          if (!_w->pos_valid(_a, _a->periph[i] + new_pos))
-            return;
-        }
-      }
+    if (_w->pos_valid_whole_actor(_a, _offset)) {
       // realize the translation
       World::remove_actor_occupancy(_a, _w);
       _a->pos = new_pos;
@@ -91,8 +82,8 @@ public:
     // only rotate the peripheral segments of the actor
     const auto center = _a->pos;
     auto periph_copy = _a->periph;
+    int count_of_valid_moves{0};
     for (int i = 0; i < periph_copy.size(); i++) {
-      v2 center = _a->pos;
       v2 cell = periph_copy[i] + center;
       periph_copy[i].x = (cell.x - center.x) * cos(_offset) -
                          (cell.y - center.y) * sin(_offset) + center.x;
@@ -100,15 +91,12 @@ public:
                          (cell.y - center.y) * cos(_offset) + center.y;
       periph_copy[i].x = std::round(periph_copy[i].x);
       periph_copy[i].y = std::round(periph_copy[i].y);
-    }
-    int count_of_valid_moves{0};
-    const auto sz_periph = periph_copy.size();
-    for (int i = 0; i < sz_periph; i++) {
-      if (_w->pos_valid(_a, periph_copy[i])) {
-        count_of_valid_moves++;
+      if(!_w->single_cell_unoccupied(_a,periph_copy[i])) {
+        count_of_valid_moves++; 
         periph_copy[i] -= center;
       }
     }
+    const auto sz_periph = periph_copy.size();
 
     if (count_of_valid_moves == sz_periph) {
       // realize the rotation

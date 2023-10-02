@@ -7,6 +7,7 @@
 // Override base class with your custom functionality
 class Example : public olc::PixelGameEngine {
   World *active_w;
+  size_t active_world_index{0};
   std::vector<World *> worlds;
   bool paused{false};
   bool drawing_neighbors{false};
@@ -56,7 +57,7 @@ class Example : public olc::PixelGameEngine {
         Draw(facing.x + x, facing.y + y, olc::RED);
         break;
       case Shape::QUAD:
-        DrawRect(
+        FillRect(
             v2i{static_cast<int>(x - radius), static_cast<int>(y - radius)},
             v2i{radius * 2, radius * 2}, olc::MAGENTA);
         break;
@@ -104,12 +105,25 @@ public:
 public:
   bool OnUserCreate() override {
     // Called once at the start, so create things here
-    active_w = new World(42, 100u);
-    worlds.push_back(active_w); // so it can be cleaned up
+    for (int i = 0; i < 10; i++) {
+      bool inverted = i % 2;
+      World * w = WorldFactory::create_world_bsp(50ul,(unsigned int)i*2, 0.1f+i*0.1f, inverted);
+      worlds.push_back(w); // so it can be cleaned up
+    }
     return true;
   }
 
   bool OnUserUpdate(float fElapsedTime) override {
+    active_w = worlds[active_world_index];
+    this->sAppName = "World: "  + std::to_string(active_world_index);
+    // START UI CODE
+    if (GetKey(olc::Key::W).bPressed) {
+      active_world_index++;
+      if (active_world_index == worlds.size() - 1)
+      {
+        active_world_index = 0;
+      }
+    }
     if (GetKey(olc::Key::P).bPressed) {
       paused = !paused;
     }
@@ -119,6 +133,7 @@ public:
     if (paused) {
       return true;
     }
+    // END UI CODE
     Clear(olc::VERY_DARK_RED);
     // Called once per frame
     std::vector<Action *> user_actions = get_user_input();

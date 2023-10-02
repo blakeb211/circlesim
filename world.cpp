@@ -1,4 +1,5 @@
 #include "spatial_generator.h"
+#include "util.h"
 #include "world.h"
 bool CellContext::operator==(const CellContext &c) const {
   return this->id == c.id && this->shape == c.shape;
@@ -60,54 +61,63 @@ World::~World() {
   std::cout << "World destructor finished\n";
 }
 
-World::World(int id, unsigned int dimx) {
+World::World(size_t dimx) { DIMX = dimx; };
+
+World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
+                                      float density, bool inverted) {
   // @TODO move world generation to its own header file
   // @TODO make sure initial placement of object is a valid spot
-  Matrix walls = gen_world_bsp(dimx, 222);
+  Matrix walls = gen_world_bsp(dimx, 42, inverted);
+  World *w = new World(dimx);
+  
+  float ang = -90 * DEG2RAD;
+  // Create hero character first
 
-  DIMX = dimx;
-  auto my_rand = rint_distr(1, 200);
-  switch (id) {
-  case 42:
-    // create hero character first
-    objs.push_back(new Actor(
-        v2{static_cast<float>(DIMX / 2), static_cast<float>(DIMX - 1)}, 0.f,
-        nullptr, Shape::QUAD));
+  Actor *hero = new Actor(v2{float(dimx / 2), float(dimx - 1)}, ang, nullptr,
+                          Shape::QUAD);
+  if (w->pos_valid_whole_actor(hero, v2(0, 0))) {
+    World::add_actor_occupancy(hero, w);
+    w->objs.push_back(hero);
+  }
 
-    for (int x = 0; x < DIMX; x++) {
-      for (int y = 0; y < DIMX; y++) {
+  for (int x = 0; x < dimx; x++) {
+    for (int y = 0; y < dimx; y++) {
+      if (walls(x, y) == 1) {
 
-        // sparse entity generation for this particular world
-        float ang = -90 * DEG2RAD;
+        Actor *new_obj =
+            new Actor(v2{static_cast<float>(x), static_cast<float>(y)}, ang,
+                      new UnmovableWallState{}, Shape::QUAD);
 
-        if (walls(x, y) == 1) {
-          objs.push_back(
-              new Actor(v2{static_cast<float>(x), static_cast<float>(y)}, ang,
-                        new UnmovableWallState{}, Shape::QUAD));
+        if (w->pos_valid_whole_actor(new_obj, v2(0, 0))) {
+          World::add_actor_occupancy(new_obj, w);
+          w->objs.push_back(new_obj);
+        }
+      } else {
+
+        auto density_rand = rint_distr(1, int(1/density))(generator);
+        if (density_rand != 1) {
           continue;
         }
+        
+        // do object placement
+        auto zero_or_one = rint_distr(0, 1)(generator);
+        Actor *new_obj =
+            zero_or_one
+                ? new Actor(v2{float(x), float(y)}, ang,
+                            new WantThreeHatNeighborsState{}, Shape::CIRC)
+                : new Actor(v2(float(x), float(y)), ang, new RandomMoveState{},
+                            Shape::THREEHAT);
 
-        if (my_rand(generator) > 197) {
-          objs.push_back(
-              new Actor(v2{static_cast<float>(x), static_cast<float>(y)}, ang,
-                        new WantThreeHatNeighborsState{}, Shape::CIRC));
+        if (w->pos_valid_whole_actor(new_obj, v2(0, 0))) {
+          World::add_actor_occupancy(new_obj, w);
+          w->objs.push_back(new_obj);
+        } else {
+          delete new_obj;
         }
-        if (my_rand(generator) == 1) {
-          objs.push_back(
-              new Actor(v2{static_cast<float>(x), static_cast<float>(y)}, ang,
-                        new RandomMoveState{}, Shape::THREEHAT));
-        }
-        if (my_rand(generator) == 3) {
-          objs.push_back(
-              new Actor(v2{static_cast<float>(x), static_cast<float>(y)}, ang,
-                        new UnmovableWallState{}, Shape::QUAD));
-        }
-      } // y loop
-    }   // x loop
-    break;
-  default:
-    assert(0);
-  };
+      }
+    } // y loop
+  }   // x loop
+  return w;
 }
 
 // @brief check that index falls within map coords
@@ -116,7 +126,7 @@ bool World::pos_falls_within_map(v2 pos) {
          (pos.y >= 0);
 }
 
-bool World::pos_valid(Actor *a, v2 pos) {
+bool World::single_cell_unoccupied(Actor *a, v2 pos) {
   // We are on a unit grid.
   // Check if cell is occupied already.
   {
@@ -133,6 +143,24 @@ bool World::pos_valid(Actor *a, v2 pos) {
     }
   }
   return false;
+}
+
+bool World::pos_valid_whole_actor(Actor *a, v2 offset) {
+  auto new_pos = a->pos + offset;
+  auto sz_periph = a->periph.size();
+  bool center_valid = this->single_cell_unoccupied(a, new_pos);
+  if (!center_valid) {
+    return false;
+  }
+  // If object has any, check if perhipheral segments are valid positions
+  // too
+  for (int i = 0; i < sz_periph; i++) {
+    if (a->visible[i]) {
+      if (!this->single_cell_unoccupied(a, a->periph[i] + new_pos))
+        return false;
+    }
+  }
+  return true;
 }
 
 std::vector<CellContext> &World::neighbors_of(Actor *a) {

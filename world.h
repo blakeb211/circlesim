@@ -24,12 +24,15 @@ template <> struct std::hash<v2i> {
 
 } // namespace std
 
+class WorldFactory;
 
 class World {
   size_t DIMX;
   std::vector<CellContext> neighbors_scratch_vec;
-
+  World() = delete;
+  World(size_t dimx);
 public:
+  friend WorldFactory;
   static CellContext EMPTY_CELL_CONTEXT;
   static void remove_actor_occupancy(Actor const * const a, World * w);
   static void add_actor_occupancy(Actor const * const a, World * w);
@@ -40,9 +43,19 @@ public:
   std::unordered_map<v2i, CellContext> occupation;
   size_t dimx() const;
   ~World();
-  World() = delete;
-  World(int id, unsigned int dimx);
   bool pos_falls_within_map(v2 pos);
-  bool pos_valid(Actor *a, v2 pos);
+  bool single_cell_unoccupied(Actor *a, v2 offset);
+  bool pos_valid_whole_actor(Actor *a, v2 offset);
   std::vector<CellContext>& neighbors_of(Actor *a);
+};
+
+
+class WorldFactory {
+  /// @brief 
+  /// @param dim 
+  /// @param seed 
+  /// @return 
+  public:
+  static World * create_world_bsp(size_t dim, unsigned int seed, float density, bool inverted);
+
 };
