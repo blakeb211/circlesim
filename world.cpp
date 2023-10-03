@@ -92,7 +92,10 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
           World::add_actor_occupancy(new_obj, w);
           w->objs.push_back(new_obj);
         }
-      } else {
+        else {
+          delete new_obj;
+        }
+      } else {  // not a wall position
 
         auto density_rand = rint_distr(1, int(1/density))(generator);
         if (density_rand != 1) {

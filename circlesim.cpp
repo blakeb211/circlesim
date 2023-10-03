@@ -59,7 +59,7 @@ class Example : public olc::PixelGameEngine {
       case Shape::QUAD:
         FillRect(
             v2i{static_cast<int>(x - radius), static_cast<int>(y - radius)},
-            v2i{radius * 2, radius * 2}, olc::MAGENTA);
+            v2i{radius * 2, radius * 2}, olc::YELLOW + olc::Pixel(25,-30,-50));
         break;
       case Shape::THREEHAT:
         FillCircle(v2i{static_cast<int>(x), static_cast<int>(y)}, radius,
@@ -107,7 +107,7 @@ public:
     // Called once at the start, so create things here
     for (int i = 0; i < 10; i++) {
       bool inverted = i % 2;
-      World * w = WorldFactory::create_world_bsp(50ul,(unsigned int)i*2, 0.1f, inverted);
+      World * w = WorldFactory::create_world_bsp(25ul,(unsigned int)i*2, 0.1f, inverted);
       worlds.push_back(w); // so it can be cleaned up
     }
     return true;
@@ -119,7 +119,7 @@ public:
     // START UI CODE
     if (GetKey(olc::Key::W).bPressed) {
       active_world_index++;
-      if (active_world_index == worlds.size() - 1)
+      if (active_world_index == worlds.size())
       {
         active_world_index = 0;
       }
