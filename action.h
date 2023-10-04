@@ -1,8 +1,8 @@
 #pragma once
 #include "actor.h"
+#include "olcPixelGameEngine.h"
 #include "util.h"
 #include "world.h"
-#include "olcPixelGameEngine.h"
 
 class Actor;
 
@@ -47,26 +47,21 @@ public:
 };
 
 class PlotLabelAction : public Action {
-  public:
+public:
   v2 pos;
   int number_of_dots;
-  World * w;
-  PlotLabelAction(World * w, v2 pos, int number_of_dots) {
+  World *w;
+  PlotLabelAction(World *w, v2 pos, int number_of_dots) {
     this->w = w;
     this->number_of_dots = number_of_dots;
     this->pos = pos;
   }
-  void execute() {
-  }
+  void execute() {}
 };
 
 class PauseGameAction : public Action {
-  PauseGameAction() {
-  
-  }
-  void execute() {
-  }
-
+  PauseGameAction() {}
+  void execute() {}
 };
 
 class RotateAction : public Action {
@@ -91,8 +86,8 @@ public:
                          (cell.y - center.y) * cos(_offset) + center.y;
       periph_copy[i].x = std::round(periph_copy[i].x);
       periph_copy[i].y = std::round(periph_copy[i].y);
-      if(!_w->single_cell_unoccupied(_a,periph_copy[i])) {
-        count_of_valid_moves++; 
+      if (_w->single_cell_unoccupied(_a, periph_copy[i])) {
+        count_of_valid_moves++;
         periph_copy[i] -= center;
       }
     }

@@ -2,10 +2,10 @@
 #include "util.h"
 #include "world.h"
 bool CellContext::operator==(const CellContext &c) const {
-  return this->id == c.id && this->shape == c.shape;
+  return (this->id == c.id) && (this->shape == c.shape);
 }
 bool CellContext::operator!=(const CellContext &c) const {
-  return this->id != c.id || this->shape != c.shape;
+  return (this->id != c.id) || (this->shape != c.shape);
 }
 
 CellContext World::EMPTY_CELL_CONTEXT = CellContext{-1, Shape::QUAD};
@@ -41,13 +41,13 @@ void World::add_actor_occupancy(Actor const *const a, World *w) {
   auto center = a->pos;
   auto sz_periph = a->periph.size();
 
-  w->occupation[v2i(static_cast<int>(center.x), static_cast<int>(center.y))] =
+  w->occupation[v2i(static_cast<int>(std::round(center.x)), static_cast<int>(std::round(center.y)))] =
       CellContext{a->get_id(), a->shape};
 
   for (int i = 0; i < sz_periph; i++) {
     const auto abs_loc = a->periph[i] + center;
-    const auto x = static_cast<int>(abs_loc.x);
-    const auto y = static_cast<int>(abs_loc.y);
+    const auto x = (int)std::round(abs_loc.x);
+    const auto y = (int)std::round(abs_loc.y);
     w->occupation[v2i(x, y)] = CellContext{a->get_id(), a->shape};
   }
 }
@@ -69,54 +69,57 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
   // @TODO make sure initial placement of object is a valid spot
   Matrix walls = gen_world_bsp(dimx, seed, inverted);
   World *w = new World(dimx);
+
+  auto try_add_actor_at_position = [](Actor * a, World * w, v2i offset) {
+    if (w->pos_valid_whole_actor(a, offset)) {
+      a->pos += offset;
+      World::add_actor_occupancy(a, w);
+      std::cout << "adding object to world";
+      w->objs.push_back(a);
+    } else {
+      delete a;
+    }
+  };
   
   float ang = -90 * DEG2RAD;
   // Create hero character first
 
-  Actor *hero = new Actor(v2{float(dimx / 2), float(dimx - 1)}, ang, nullptr,
+  auto hero_start_pos = v2{float(dimx / 2), float(dimx - 1)};
+  const auto pre_placement_pos = v2{-99,-99};
+
+  Actor *hero = new Actor(pre_placement_pos, ang, nullptr,
                           Shape::QUAD);
-  if (w->pos_valid_whole_actor(hero, v2(0, 0))) {
-    World::add_actor_occupancy(hero, w);
-    w->objs.push_back(hero);
-  }
+
+  auto offset = hero_start_pos - pre_placement_pos;
+  try_add_actor_at_position(hero, w, offset);
 
   for (int x = 0; x < dimx; x++) {
     for (int y = 0; y < dimx; y++) {
       if (walls(x, y) == 1) {
 
-        Actor *new_obj =
-            new Actor(v2{float(x), float(y)}, ang,
-                      new UnmovableWallState{}, Shape::QUAD);
+        Actor *new_obj = new Actor(pre_placement_pos, ang,
+                                   new UnmovableWallState{}, Shape::QUAD);
+        auto actor_pos = v2{float(x), float(y)};
+        try_add_actor_at_position(new_obj, w, actor_pos - pre_placement_pos);
 
-        if (w->pos_valid_whole_actor(new_obj, v2(0, 0))) {
-          World::add_actor_occupancy(new_obj, w);
-          w->objs.push_back(new_obj);
-        }
-        else {
-          delete new_obj;
-        }
-      } else {  // not a wall position
+      } else { // not a wall position
 
-        auto density_rand = rint_distr(1, int(1/density))(generator);
+        auto density_rand = rint_distr(1, int(1 / density))(generator);
         if (density_rand != 1) {
           continue;
         }
-        
+
         // do object placement
         auto zero_or_one = rint_distr(0, 1)(generator);
         Actor *new_obj =
             zero_or_one
-                ? new Actor(v2{float(x), float(y)}, ang,
+                ? new Actor(pre_placement_pos, ang,
                             new WantThreeHatNeighborsState{}, Shape::CIRC)
-                : new Actor(v2(float(x), float(y)), ang, new RandomMoveState{},
+                : new Actor(pre_placement_pos, ang, new RandomMoveState{},
                             Shape::THREEHAT);
 
-        if (w->pos_valid_whole_actor(new_obj, v2(0, 0))) {
-          World::add_actor_occupancy(new_obj, w);
-          w->objs.push_back(new_obj);
-        } else {
-          delete new_obj;
-        }
+        auto actor_pos = v2{float(x), float(y)};
+        try_add_actor_at_position(new_obj, w, actor_pos - pre_placement_pos);
       }
     } // y loop
   }   // x loop
@@ -132,18 +135,18 @@ bool World::pos_falls_within_map(v2 pos) {
 bool World::single_cell_unoccupied(Actor *a, v2 pos) {
   // We are on a unit grid.
   // Check if cell is occupied already.
-  {
-    if (!pos_falls_within_map(pos)) {
-      return false;
-    }
-    v2i pos_int = v2i(std::round(pos.x), std::round(pos.y));
-    if (occupation.find(pos_int) == occupation.end()) {
-      return true;
-    }
-    CellContext tmp = occupation[pos_int];
-    if (tmp.id == a->get_id() || tmp == World::EMPTY_CELL_CONTEXT) {
-      return true;
-    }
+  if (!pos_falls_within_map(pos)) {
+    return false;
+  }
+  v2i pos_int = v2i((int)std::round(pos.x), (int)std::round(pos.y));
+  // no map entry for location
+  if (occupation.find(pos_int) == occupation.end()) {
+    return true;
+  }
+  CellContext tmp = occupation[pos_int];
+  // does cell contain part of actor a or the empty cell sentinel
+  if (tmp.id == a->get_id() || tmp == World::EMPTY_CELL_CONTEXT) {
+    return true;
   }
   return false;
 }

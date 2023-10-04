@@ -136,6 +136,17 @@ public:
     }
     if (GetKey(olc::Key::P).bPressed) {
       paused = !paused;
+      if (paused == true) {
+        for (auto it = active_w->occupation.begin(); it != active_w->occupation.end(); it++) {
+            auto x = it->first.x;
+            auto y = it->first.y;
+            if (x == 11 && y == 12)
+            std::cout << x << "," << y << " occupation = " << 
+            active_w->occupation[v2i(x,y)].id << "|"  << 
+            (int)active_w->occupation[v2i(x,y)].shape << std::endl; 
+          }
+
+      }
     }
     if (GetKey(olc::Key::D).bPressed) {
       drawing_neighbors = !drawing_neighbors;
