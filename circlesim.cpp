@@ -11,6 +11,7 @@ class Example : public olc::PixelGameEngine {
   std::vector<World *> worlds;
   bool paused{false};
   bool drawing_neighbors{false};
+  bool drawing_grid{false};
 
   auto get_user_input() -> std::vector<Action *> {
     std::vector<Action *> ret;
@@ -82,6 +83,15 @@ class Example : public olc::PixelGameEngine {
           DrawString(x, y, std::to_string(o->neighbors));
         }
       }
+      if (drawing_grid) {
+        if (o->shape == Shape::QUAD) {
+          continue;
+        }
+          auto x_string = std::to_string((int)o->pos.x);
+          auto y_string = std::to_string((int)o->pos.y);
+          auto tot_string = x_string + "," + y_string;
+          DrawString(x, y, tot_string, olc::DARK_BLUE);
+      }
     }
   }
 
@@ -129,6 +139,9 @@ public:
     }
     if (GetKey(olc::Key::D).bPressed) {
       drawing_neighbors = !drawing_neighbors;
+    }
+    if (GetKey(olc::Key::G).bPressed) {
+      drawing_grid = !drawing_grid;
     }
     if (paused) {
       return true;

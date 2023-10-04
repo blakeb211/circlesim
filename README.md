@@ -1,7 +1,12 @@
 # 2d game to go inside of larger 3d viewer
-* debug overlap of guys with walls 
+* debug wall collision issue; Circ overlaps a wall piece in world 0 at 11,12 
+- consider rollback
+- add a g command to show the grid
+- print occupation map 
+- where could I set a breakpoint?
+
 * add a circling state
-* add a wrapping state
+* make WantNeighborsThreeHats jump towards a cluster if its within 4 units
 * add multiple worlds with different initializations and toggle active world
 * write a 3d ui that interfaces with it 
 
