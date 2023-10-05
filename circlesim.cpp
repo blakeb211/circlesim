@@ -117,7 +117,7 @@ public:
     // Called once at the start, so create things here
     for (int i = 0; i < 10; i++) {
       bool inverted = i % 2;
-      World * w = WorldFactory::create_world_bsp(25ul,(unsigned int)i*2, 0.1f, inverted);
+      World * w = WorldFactory::create_world_bsp(25ul,(unsigned int)i*2, 0.05f, inverted);
       worlds.push_back(w); // so it can be cleaned up
     }
     return true;
@@ -136,17 +136,6 @@ public:
     }
     if (GetKey(olc::Key::P).bPressed) {
       paused = !paused;
-      if (paused == true) {
-        for (auto it = active_w->occupation.begin(); it != active_w->occupation.end(); it++) {
-            auto x = it->first.x;
-            auto y = it->first.y;
-            if (x == 11 && y == 12)
-            std::cout << x << "," << y << " occupation = " << 
-            active_w->occupation[v2i(x,y)].id << "|"  << 
-            (int)active_w->occupation[v2i(x,y)].shape << std::endl; 
-          }
-
-      }
     }
     if (GetKey(olc::Key::D).bPressed) {
       drawing_neighbors = !drawing_neighbors;
@@ -158,7 +147,7 @@ public:
       return true;
     }
     // END UI CODE
-    Clear(olc::VERY_DARK_RED);
+    Clear(olc::VERY_DARK_GREY);
     // Called once per frame
     std::vector<Action *> user_actions = get_user_input();
     for (auto &a : user_actions) {

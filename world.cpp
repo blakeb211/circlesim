@@ -74,7 +74,6 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
     if (w->pos_valid_whole_actor(a, offset)) {
       a->pos += offset;
       World::add_actor_occupancy(a, w);
-      std::cout << "adding object to world";
       w->objs.push_back(a);
     } else {
       delete a;
