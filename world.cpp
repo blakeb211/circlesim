@@ -109,14 +109,21 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
         }
 
         // do object placement
-        auto zero_or_one = rint_distr(0, 1)(generator);
+        auto dice_roll = rint_distr(0, 6)(generator);
         Actor *new_obj =
-            zero_or_one
+            dice_roll > 0
                 ? new Actor(pre_placement_pos, ang,
                             new WantThreeHatNeighborsState{}, Shape::CIRC)
                 : new Actor(pre_placement_pos, ang, new RandomMoveState{},
                             Shape::THREEHAT);
 
+        // make some of the monoactors circlers
+        auto dice_roll2 = rint_distr(0, 6)(generator);
+        if (new_obj->shape == Shape::CIRC && dice_roll2 == 0) {
+          delete new_obj->state;
+          new_obj->state = new CirclingState{5, x, y};
+        }
+        
         auto actor_pos = v2{float(x), float(y)};
         try_add_actor_at_position(new_obj, w, actor_pos - pre_placement_pos);
       }

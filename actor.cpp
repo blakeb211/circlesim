@@ -70,6 +70,32 @@ auto RandomMoveState::update(Actor *a, World *w, float dt) -> Action * {
   return nullptr;
 }
 
+auto CirclingState::handle_input() -> State * { return this; }
+
+Action *CirclingState::update(Actor *o, World *w, float dt) { 
+  // dt in seconds
+  if (params.find("timer") != params.end()) {
+    params["timer"] = params["timer"] + dt;
+  } else {
+    // set initially to zero
+    params["timer"] = 0.f;
+  }
+
+  if (params["timer"] >= UPDATE_INTERVAL) {
+    params["timer"] -= UPDATE_INTERVAL;
+
+    if (params.find("theta") == params.end()) {
+      params["theta"] = 0.f;
+    }
+
+    params["theta"] += PI/4;
+    auto new_x = center.x + cos(params["theta"])*radius;
+    auto new_y = center.y + sin(params["theta"])*radius;
+    return new MoveAction(o, w, v2{std::round(float(new_x - o->pos.x)), std::round(float(new_y - o->pos.y))});
+  }
+  return nullptr;
+}
+
 Actor::Actor(v2 pos, float rot, State *initial_state, Shape shape) {
   this->id = actor_count++;
   this->pos = pos;
@@ -97,3 +123,4 @@ auto Actor::update(World *w, float dt) -> Action * {
   assert(0); // should be unreachable
   return nullptr;
 }
+

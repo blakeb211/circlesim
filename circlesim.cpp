@@ -51,10 +51,16 @@ class Example : public olc::PixelGameEngine {
       // To make actors with multiple pieces easier to draw
       const auto &perhip = o->periph;
       auto sz = perhip.size();
+      State * tmp_circ = new CirclingState(4,1,1);
       switch (o->shape) {
       case Shape::CIRC:
+      if (typeid(*(o->state)) == typeid(*tmp_circ)) {
+        FillCircle(v2i{static_cast<int>(x), static_cast<int>(y)}, radius,
+                   olc::WHITE);
+      } else {
         FillCircle(v2i{static_cast<int>(x), static_cast<int>(y)}, radius,
                    olc::BLUE);
+      }
         Draw(facing.x + x, facing.y + y, olc::RED);
         break;
       case Shape::QUAD:
@@ -77,6 +83,8 @@ class Example : public olc::PixelGameEngine {
         Draw(v2i{static_cast<int>(x), static_cast<int>(y)});
         break;
       };
+
+        delete tmp_circ;
       // draw text labels
       if (drawing_neighbors) {
         if (o->neighbors > -1) {
@@ -117,7 +125,7 @@ public:
     // Called once at the start, so create things here
     for (int i = 0; i < 10; i++) {
       bool inverted = i % 2;
-      World * w = WorldFactory::create_world_bsp(25ul,(unsigned int)i*2, 0.05f, inverted);
+      World * w = WorldFactory::create_world_bsp(50ul,(unsigned int)i*2, 0.05f, inverted);
       worlds.push_back(w); // so it can be cleaned up
     }
     return true;

@@ -16,7 +16,7 @@ static bool g_time_to_cleanup{false}; // only used in main cpp file
 #define PI 3.14159265
 #define RAD2DEG 180. / PI
 #define DEG2RAD PI / 180.
-#define UPDATE_INTERVAL 0.2
+#define UPDATE_INTERVAL 0.4
 
 static inline float clamp(float num, float min, float max) {
     if (num < min) {

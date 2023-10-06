@@ -32,7 +32,7 @@ Matrix gen_world_bsp(unsigned int dimx, unsigned int seed, bool invert) {
   auto res = Matrix(dimx, dimx);
   int rooms = 0;
 
-  while (rooms < clamp(seed % 20, 2, 99)) {
+  while (rooms < 9) {
     rooms = rooms + 1;
     int x0 = 0;
     int y0 = 0;
@@ -40,7 +40,7 @@ Matrix gen_world_bsp(unsigned int dimx, unsigned int seed, bool invert) {
     int y1 = dimx;
     int i = 0;
     // bifurcate until room obtained
-    while (i < clamp(dimx / 10 - 3, 3, 8)) {
+    while (i < clamp(dimx / 10 - 3, 3, 5)) {
       int is_vert = rint_distr(0, 1)(generator);
       if (is_vert == 1) {
         int dx = int(std::round(std::abs(x1 - x0) / 2));

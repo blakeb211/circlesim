@@ -1,6 +1,8 @@
 # 2d game to go inside of larger 3d viewer
 * add a circling state
+* tweak the bsp to be a little more dense on walls
 * make WantNeighborsThreeHats jump towards a cluster if its within 4 units
+* decouple the game from the PGE so that it can be compiled in either 3d or 2d mode
 * write a 3d ui that interfaces with it 
 
 # high level design
