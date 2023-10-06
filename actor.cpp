@@ -88,7 +88,7 @@ Action *CirclingState::update(Actor *o, World *w, float dt) {
       params["theta"] = 0.f;
     }
 
-    params["theta"] += PI/4;
+    params["theta"] += PI/8;
     auto new_x = center.x + cos(params["theta"])*radius;
     auto new_y = center.y + sin(params["theta"])*radius;
     return new MoveAction(o, w, v2{std::round(float(new_x - o->pos.x)), std::round(float(new_y - o->pos.y))});
