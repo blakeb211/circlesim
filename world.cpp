@@ -8,7 +8,7 @@ bool CellContext::operator!=(const CellContext &c) const {
   return (this->id != c.id) || (this->shape != c.shape);
 }
 
-CellContext World::EMPTY_CELL_CONTEXT = CellContext{-1, Shape::QUAD};
+CellContext World::EMPTY_CELL_CONTEXT = CellContext{-1, Shape::TRI};
 
 /// @brief remove actor segments from each cell it occupies
 /// @param a actor pointer
@@ -41,7 +41,8 @@ void World::add_actor_occupancy(Actor const *const a, World *w) {
   auto center = a->pos;
   auto sz_periph = a->periph.size();
 
-  w->occupation[v2i(static_cast<int>(std::round(center.x)), static_cast<int>(std::round(center.y)))] =
+  w->occupation[v2i(static_cast<int>(std::round(center.x)),
+                    static_cast<int>(std::round(center.y)))] =
       CellContext{a->get_id(), a->shape};
 
   for (int i = 0; i < sz_periph; i++) {
@@ -70,7 +71,7 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
   Matrix walls = gen_world_bsp(dimx, seed, inverted);
   World *w = new World(dimx);
 
-  auto try_add_actor_at_position = [](Actor * a, World * w, v2i offset) {
+  auto try_add_actor_at_position = [](Actor *a, World *w, v2i offset) {
     if (w->pos_valid_whole_actor(a, offset)) {
       a->pos += offset;
       World::add_actor_occupancy(a, w);
@@ -79,15 +80,14 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
       delete a;
     }
   };
-  
+
   float ang = -90 * DEG2RAD;
   // Create hero character first
 
   auto hero_start_pos = v2{float(dimx / 2), float(dimx - 1)};
-  const auto pre_placement_pos = v2{-99,-99};
+  const auto pre_placement_pos = v2{-99, -99};
 
-  Actor *hero = new Actor(pre_placement_pos, ang, nullptr,
-                          Shape::QUAD);
+  Actor *hero = new Actor(pre_placement_pos, ang, nullptr, Shape::QUAD);
 
   auto offset = hero_start_pos - pre_placement_pos;
   try_add_actor_at_position(hero, w, offset);
@@ -123,7 +123,7 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
           delete new_obj->state;
           new_obj->state = new CirclingState{5, x, y};
         }
-        
+
         auto actor_pos = v2{float(x), float(y)};
         try_add_actor_at_position(new_obj, w, actor_pos - pre_placement_pos);
       }
@@ -212,4 +212,42 @@ std::vector<CellContext> &World::neighbors_of(Actor *a) {
   }
 
   return n;
+}
+
+// Find direction of nearest attractor within given radius
+v2 World::direction_nearest(Actor *a, Shape attractor, int radius) {
+  // collect offsets
+  auto pos = a->pos;
+  std::set<v2i> pos_to_check;
+  float radius_f = (float)radius;
+  for (; radius_f > -1; radius_f--) {
+    pos_to_check.insert(pos + v2{radius_f, radius_f});
+    pos_to_check.insert(pos + v2{radius_f, 0});
+    pos_to_check.insert(pos + v2{0, radius_f});
+    pos_to_check.insert(pos + v2{-radius_f, radius_f});
+    pos_to_check.insert(pos + v2{-radius_f, 0});
+    pos_to_check.insert(pos + v2{radius_f, -radius_f});
+    pos_to_check.insert(pos + v2{0, -radius_f});
+    pos_to_check.insert(pos + v2{-radius_f, -radius_f});
+  }
+  // loop through offsets checking Shape and distance
+  v2i closest{9999, 9999};
+  for (auto _off : pos_to_check) {
+    if (this->occupation.find(pos) != this->occupation.end() && this->occupation[pos].shape == attractor) {
+      if (_off.norm() < closest.norm()) {
+        closest = _off;
+      }
+    }
+  }
+  if (closest != v2i{9999, 9999}) {
+    auto move_dir = closest - pos;
+    move_dir = move_dir / move_dir.norm();
+    move_dir.x = std::round(move_dir.x);
+    move_dir.y = std::round(move_dir.y);
+    // returning an offset
+    return move_dir;
+  }
+  float offsetx = rint_distr(-2, 2)(generator);
+  float offsety = rint_distr(-2, 2)(generator);
+  return v2(offsetx, offsety);
 }

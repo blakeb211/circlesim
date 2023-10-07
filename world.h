@@ -44,9 +44,10 @@ public:
   size_t dimx() const;
   ~World();
   bool pos_falls_within_map(v2 pos);
-  bool single_cell_unoccupied(Actor *a, v2 offset);
+  bool single_cell_unoccupied(Actor *a, v2 pos);
   bool pos_valid_whole_actor(Actor *a, v2 offset);
   std::vector<CellContext>& neighbors_of(Actor *a);
+  v2 direction_nearest(Actor * a, Shape attractor, int radius);
 };
 
 

@@ -56,17 +56,17 @@ class Example : public olc::PixelGameEngine {
       case Shape::CIRC:
       if (typeid(*(o->state)) == typeid(*tmp_circ)) {
         FillCircle(v2i{static_cast<int>(x), static_cast<int>(y)}, radius,
-                   olc::WHITE);
+                   o->color);
       } else {
         FillCircle(v2i{static_cast<int>(x), static_cast<int>(y)}, radius,
-                   olc::BLUE);
+                   o->color);
       }
         Draw(facing.x + x, facing.y + y, olc::RED);
         break;
       case Shape::QUAD:
         FillRect(
             v2i{static_cast<int>(x - radius), static_cast<int>(y - radius)},
-            v2i{radius * 2, radius * 2}, olc::YELLOW + olc::Pixel(25,-30,-50));
+            v2i{radius * 2, radius * 2}, olc::DARK_YELLOW); 
         break;
       case Shape::THREEHAT:
         FillCircle(v2i{static_cast<int>(x), static_cast<int>(y)}, radius,

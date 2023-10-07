@@ -1,5 +1,4 @@
 # 2d game to go inside of larger 3d viewer
-* make WantNeighborsThreeHats jump towards a cluster if its within 4 units
 * decouple the game from the PGE so that it can be compiled in either 3d or 2d mode
 * write a 3d ui that interfaces with it 
 
@@ -10,6 +9,7 @@
 * update is driven by state if the actor has a state, otherwise the actor update method 
 
 # done
+* make WantNeighborsThreeHats jump towards a cluster if its within a certain number of units
 * add a circling state
 * tweak the bsp to be a little more dense on walls
 * add multiple worlds with different initializations and toggle active world
