@@ -14,7 +14,6 @@ public:
   Game *g;
   UI() = delete;
   UI(Game *g);
-  auto game_init(Game *g) -> void;
   auto get_user_input(Game *g) -> std::vector<Action *>;
   void draw_world_PGE_2d(Game *g, World *w);
   auto update_world(World *w, float dt) -> std::vector<Action *>;
@@ -28,15 +27,6 @@ public:
 // Override base class with your custom functionality
 UI::UI(Game *g) : g{g} {}
 
-auto UI::game_init(Game *g) -> void {
-  // Called once at the start, so create things here
-  for (int i = 0; i < 10; i++) {
-    bool inverted = i % 2;
-    World *w = WorldFactory::create_world_bsp(50ul, (unsigned int)i * 2, 0.05f,
-                                              inverted);
-    g->worlds.push_back(w); // so it can be cleaned up
-  }
-}
 
 auto UI::get_user_input(Game *g) -> std::vector<Action *> {
   std::vector<Action *> ret;
@@ -155,7 +145,7 @@ auto UI::update_world(World *w, float dt) -> std::vector<Action *> {
 }
 
 bool UI::OnUserCreate() {
-  game_init(g);
+  g->init();
   return true;
 }
 

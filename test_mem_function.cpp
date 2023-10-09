@@ -12,16 +12,16 @@ class World{ };
 // Game class definition
 typedef std::vector<Action *> (UI::*ExampleMemFnActionRet)(
     Game *);                                                  // Please do this!
-typedef void (UI::*GameInitMemFn)(Game *);         // Please do this!
-typedef void (UI::*DrawWorldMemFn)(Game *, World *); // Please do this!
+typedef void (UI::*ExampleMemFnVoidRet)(Game *);         // Please do this!
+typedef void (UI::*ExampleMemFnGWVoid)(Game *, World *); // Please do this!
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
 class UI {
 public:
   ExampleMemFnActionRet fun1;
-  GameInitMemFn fun2;
+  ExampleMemFnVoidRet fun2;
 
-  DrawWorldMemFn fun3;
+  ExampleMemFnGWVoid fun3;
   // Example constructor
   UI();
 
@@ -35,8 +35,8 @@ public:
 
 struct Game {
   ExampleMemFnActionRet get_user_input;
-  GameInitMemFn init_game;
-  DrawWorldMemFn draw_world;
+  ExampleMemFnVoidRet init_game;
+  ExampleMemFnGWVoid draw_world;
 };
 
 UI::UI() {}

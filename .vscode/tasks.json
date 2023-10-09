@@ -20,6 +20,7 @@
 				"actor.cpp",
 				"world.cpp",
 				"circlesim.cpp",
+				"game.cpp",
 				"-o",
 				"circlesim",
 				"-lX11",

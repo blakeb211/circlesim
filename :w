@@ -25,4 +25,3 @@ struct Game {
   bool time_to_cleanup{false}; 
   void init();
 };
-
