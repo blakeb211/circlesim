@@ -109,6 +109,6 @@ class QuitAction : public Action {
   Game * g;
 public:
   QuitAction() = delete;
-  QuitAction(Game * g) {}
+  QuitAction(Game * g) { this->g = g; }
   void execute() override { g->time_to_cleanup = true; }
 };

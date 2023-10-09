@@ -22,5 +22,5 @@ struct Game {
   UserInputMemFn process_user_input;
   GameInitMemFn game_init;
   DrawWorldMemFn draw_world;
-  bool time_to_cleanup{false}; // only used in main cpp file
+  bool time_to_cleanup{false}; 
 };

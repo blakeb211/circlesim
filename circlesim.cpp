@@ -1,10 +1,13 @@
 #define OLC_PGE_APPLICATION
+#include "action.h"
 #include "actor.h"
+#include "game.h"
 #include "util.h"
 #include "world.h"
-#include "action.h"
-#include "game.h"
 
+#define TWOD 1
+
+#if TWOD
 // Override base class with your custom functionality
 class UI : public olc::PixelGameEngine {
 public:
@@ -163,7 +166,7 @@ bool UI::OnUserUpdate(float fElapsedTime) {
   if (g->paused) {
     return true;
   }
-  
+
   Clear(olc::VERY_DARK_GREY);
   // Called once per frame
   std::vector<Action *> user_actions = get_user_input(g);
@@ -186,13 +189,15 @@ bool UI::OnUserUpdate(float fElapsedTime) {
   }
   return true;
 }
-
+#endif
 
 int main() {
   Game *g = new Game();
-  UI demo(g);
 
+#if TWOD
+  UI demo(g);
   if (demo.Construct(512, 480, 4, 4, false, false))
     demo.Start();
+#endif
   return 0;
 }
