@@ -3,6 +3,7 @@
 #include "olcPixelGameEngine.h"
 #include "util.h"
 #include "world.h"
+#include "game.h"
 
 class Actor;
 
@@ -102,8 +103,12 @@ public:
   }
 };
 
+
+
 class QuitAction : public Action {
+  Game * g;
 public:
-  QuitAction() {}
-  void execute() override { g_time_to_cleanup = true; }
+  QuitAction() = delete;
+  QuitAction(Game * g) {}
+  void execute() override { g->time_to_cleanup = true; }
 };

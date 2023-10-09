@@ -6,13 +6,13 @@
 #include <random>
 #include <array>
 #include <set>
+#include <functional>
 
 using vec_pts = std::vector<olc::vf2d>;
 using veci_pts = std::vector<olc::vi2d>;
 using v2 = olc::vf2d;
 using v2i = olc::vi2d;
 using rint_distr = std::uniform_int_distribution<int>;
-static bool g_time_to_cleanup{false}; // only used in main cpp file
 #define PI 3.14159265
 #define RAD2DEG 180. / PI
 #define DEG2RAD PI / 180.
