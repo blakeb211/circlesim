@@ -11,3 +11,18 @@ void Game::init() {
 
 }
 
+/// @brief 
+/// @param w 
+/// @param dt 
+/// @return 
+auto Game::update_world(World *w, float dt) -> std::vector<Action *> {
+  std::vector<Action *> ret;
+  for (auto &o : w->objs) {
+    Action *res = o->update(w, dt);
+    if (res) {
+      ret.push_back(res);
+    }
+  }
+  return ret;
+}
+

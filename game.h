@@ -19,10 +19,11 @@ struct Game {
   bool paused{false};
   bool drawing_neighbors{false};
   bool drawing_grid{false};
-  UserInputMemFn process_user_input;
+/*   UserInputMemFn process_user_input;
   GameInitMemFn game_init;
-  DrawWorldMemFn draw_world;
+  DrawWorldMemFn draw_world; */
   bool time_to_cleanup{false}; 
   void init();
+  std::vector<Action*> update_world(World *w, float dt);
 };
 

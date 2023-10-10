@@ -11,6 +11,13 @@ class Action {
 public:
   virtual ~Action(){};
   virtual void execute() = 0;
+  // Execute and free container of action pointers
+  static void run_actions(std::vector<Action*> l) {
+    for (auto &a : l) {
+      a->execute();
+      delete (a);
+    }
+  }
 };
 
 class MoveAction : public Action {

@@ -2,7 +2,6 @@
 #include "action.h"
 #include "actor.h"
 #include "game.h"
-#include "util.h"
 #include "world.h"
 
 #define TWOD 1
@@ -16,7 +15,6 @@ public:
   UI(Game *g);
   auto get_user_input(Game *g) -> std::vector<Action *>;
   void draw_world_PGE_2d(Game *g, World *w);
-  auto update_world(World *w, float dt) -> std::vector<Action *>;
 
 public:
   bool OnUserCreate() override;
@@ -24,7 +22,6 @@ public:
   bool OnUserUpdate(float fElapsedTime) override;
 };
 
-// Override base class with your custom functionality
 UI::UI(Game *g) : g{g} {}
 
 
@@ -133,23 +130,12 @@ void UI::draw_world_PGE_2d(Game *g, World *w) {
   }
 }
 
-auto UI::update_world(World *w, float dt) -> std::vector<Action *> {
-  std::vector<Action *> ret;
-  for (auto &o : w->objs) {
-    Action *res = o->update(w, dt);
-    if (res) {
-      ret.push_back(res);
-    }
-  }
-  return ret;
-}
-
 bool UI::OnUserCreate() {
-  g->init();
   return true;
 }
 
 bool UI::OnUserUpdate(float fElapsedTime) {
+  // Called once per frame
   g->active_w = g->worlds[g->active_world_index];
   this->sAppName = "World: " + std::to_string(g->active_world_index);
 
@@ -158,17 +144,10 @@ bool UI::OnUserUpdate(float fElapsedTime) {
   }
 
   Clear(olc::VERY_DARK_GREY);
-  // Called once per frame
   std::vector<Action *> user_actions = get_user_input(g);
-  for (auto &a : user_actions) {
-    a->execute();
-    delete (a);
-  }
-  std::vector<Action *> ai_actions = update_world(g->active_w, fElapsedTime);
-  for (auto &a : ai_actions) {
-    a->execute();
-    delete (a);
-  }
+  Action::run_actions(user_actions);
+  std::vector<Action *> ai_actions = g->update_world(g->active_w, fElapsedTime);
+  Action::run_actions(ai_actions);
 
   draw_world_PGE_2d(g, g->active_w);
   if (g->time_to_cleanup) {
@@ -179,10 +158,17 @@ bool UI::OnUserUpdate(float fElapsedTime) {
   }
   return true;
 }
+#else
+// Three d UI
+class UI2 : QMainWindow {
+
+
+};
 #endif
 
 int main() {
   Game *g = new Game();
+  g->init();
 
 #if TWOD
   UI demo(g);
