@@ -1,7 +1,11 @@
-#define OLC_PGE_APPLICATION
 #define TWOD 0
 
+#ifdef TWOD
+#define OLC_PGE_APPLICATION
+#endif
+
 #include <QtGui/QGuiApplication>
+#include <QtCore/QTimer>
 
  #include <Qt3DCore/qentity.h>
  #include <Qt3DRender/qcamera.h>
@@ -191,6 +195,14 @@ bool UI::OnUserUpdate(float fElapsedTime) {
 // Three d UI
 #endif
 
+
+
+
+
+
+
+
+
 int main(int argc, char ** argv) {
   Game *g = new Game();
   g->init();
@@ -201,7 +213,9 @@ int main(int argc, char ** argv) {
     demo.Start();
 #else
 
-    QApplication app(argc, argv);
+    /* QWidget is the window. Container is the window of the 3d rendering view. 
+    */
+    QApplication app(argc, argv); // event loop
     Qt3DExtras::Qt3DWindow *view = new Qt3DExtras::Qt3DWindow();
     view->defaultFrameGraph()->setClearColor(QColor(QRgb(0x4d4d4f)));
     QWidget *container = QWidget::createWindowContainer(view);
@@ -224,7 +238,7 @@ int main(int argc, char ** argv) {
     // Camera
     Qt3DRender::QCamera *cameraEntity = view->camera();
 
-    cameraEntity->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.1f, 1000.0f);
+    cameraEntity->lens()->setPerspectiveProjection(65.0f, 16.0f/9.0f, 0.1f, 1000.0f);
     cameraEntity->setPosition(QVector3D(0, 0, 20.0f));
     cameraEntity->setUpVector(QVector3D(0, 1, 0));
     cameraEntity->setViewCenter(QVector3D(0, 0, 0));
@@ -251,8 +265,7 @@ int main(int argc, char ** argv) {
     // Create control widgets
     QCommandLinkButton *info = new QCommandLinkButton();
     info->setText(QStringLiteral("Qt3D ready-made meshes"));
-    info->setDescription(QString::fromLatin1("Qt3D provides several ready-made meshes, like torus, cylinder, cone, "
-                                             "cube, plane and sphere."));
+    info->setDescription(QString::fromLatin1("World Information"));
     info->setIconSize(QSize(0,0));
 
     QCheckBox *torusCB = new QCheckBox(widget);
@@ -306,6 +319,23 @@ int main(int argc, char ** argv) {
     cuboidCB->setChecked(true);
     planeCB->setChecked(true);
     sphereCB->setChecked(true);
+
+    // Set up a timer for updates
+    QTimer timer;
+    QObject::connect(&timer, &QTimer::timeout, [&view] {
+        // Update your simulation state here
+        // ...
+        // Trigger a Qt3D frame update
+        view->requestUpdate();
+    });
+
+    // Start the timer
+    timer.start(16); // Update every 16 milliseconds (about 60 FPS)
+
+    // Show the Qt3D window
+    view->show();
+
+
 
     // Show window
     widget->show();
