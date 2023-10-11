@@ -20,8 +20,9 @@
 				"-O0",
 				"actor.cpp",
 				"world.cpp",
-				"circlesim.cpp",
 				"game.cpp",
+				"scenemodifier.cpp",
+				"circlesim.cpp",
 				"-o",
 				"circlesim",
 				"-lX11",
@@ -30,6 +31,9 @@
 				"-lQt6Core",
 				"-lQt6Gui",
 				"-lQt6Widgets",
+				"-lQt63DCore",
+				"-lQt63DRender",
+				"-lQt63DExtras",
 
 			],
 			"options": {
