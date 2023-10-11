@@ -1,10 +1,41 @@
 #define OLC_PGE_APPLICATION
+#define TWOD 1
+
+#include <QtGui/QGuiApplication>
+
+/*  #include <Qt3DCore/qentity.h>
+ #include <Qt3DRender/qcamera.h>
+ #include <Qt3DRender/qcameralens.h>
+
+ #include <QtGui/QScreen>
+ #include <QtWidgets/QApplication>
+ #include <QtWidgets/QCheckBox>
+ #include <QtWidgets/QCommandLinkButton>
+ #include <QtWidgets/QHBoxLayout>
+ #include <QtWidgets/QWidget>
+
+ #include <Qt3DExtras/qtorusmesh.h>
+ #include <Qt3DRender/qeffect.h>
+ #include <Qt3DRender/qmaterial.h>
+ #include <Qt3DRender/qmesh.h>
+ #include <Qt3DRender/qpointlight.h>
+ #include <Qt3DRender/qrenderpass.h>
+ #include <Qt3DRender/qsceneloader.h>
+ #include <Qt3DRender/qtechnique.h>
+ #include <Qt3DRender/qtexture.h>
+
+ #include <Qt3DCore/qaspectengine.h>
+ #include <Qt3DCore/qtransform.h>
+
+ #include <Qt3DExtras/qforwardrenderer.h>
+ #include <Qt3DRender/qrenderaspect.h>
+
+ #include <Qt3DExtras/qfirstpersoncameracontroller.h>
+ #include <Qt3DExtras/qt3dwindow.h> */
 #include "action.h"
 #include "actor.h"
 #include "game.h"
 #include "world.h"
-
-#define TWOD 1
 
 #if TWOD
 // Override base class with your custom functionality
@@ -23,7 +54,6 @@ public:
 };
 
 UI::UI(Game *g) : g{g} {}
-
 
 auto UI::get_user_input(Game *g) -> std::vector<Action *> {
   std::vector<Action *> ret;
@@ -130,9 +160,7 @@ void UI::draw_world_PGE_2d(Game *g, World *w) {
   }
 }
 
-bool UI::OnUserCreate() {
-  return true;
-}
+bool UI::OnUserCreate() { return true; }
 
 bool UI::OnUserUpdate(float fElapsedTime) {
   // Called once per frame
@@ -160,10 +188,7 @@ bool UI::OnUserUpdate(float fElapsedTime) {
 }
 #else
 // Three d UI
-class UI2 : QMainWindow {
-
-
-};
+class UI2 : QMainWindow {};
 #endif
 
 int main() {
