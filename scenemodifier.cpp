@@ -26,6 +26,15 @@ SceneModifier::SceneModifier(Qt3DCore::QEntity *rootEntity)
     torusTransform->setTranslation(QVector3D(5.0f, 4.0f, 0.0f));
     //! [1]
 
+    // TorusMesh Transform
+    //! [1]
+    Qt3DCore::QTransform *torusTransform2 = new Qt3DCore::QTransform();
+    torusTransform2->setScale(1.5f);
+    torusTransform2->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 25.0f));
+    torusTransform2->setTranslation(QVector3D(5.0f, 3.0f, 0.0f));
+    //! [1]
+
+
     //! [2]
     Qt3DExtras::QPhongMaterial *torusMaterial = new Qt3DExtras::QPhongMaterial();
     torusMaterial->setDiffuse(QColor(QRgb(0xbeb32b)));
@@ -38,6 +47,7 @@ SceneModifier::SceneModifier(Qt3DCore::QEntity *rootEntity)
         m_torusEntity->addComponent(m_torus);
         m_torusEntity->addComponent(torusMaterial);
         m_torusEntity->addComponent(torusTransform);
+        //m_torusEntity->addComponent(torusTransform2);
         //! [3]
     }
 

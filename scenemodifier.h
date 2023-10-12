@@ -32,7 +32,6 @@ public slots:
     void enablePlane(bool enabled);
     void enableSphere(bool enabled);
 
-private:
     Qt3DCore::QEntity *m_rootEntity;
     Qt3DExtras::QTorusMesh *m_torus;
     Qt3DCore::QEntity *m_coneEntity;
