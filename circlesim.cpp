@@ -42,6 +42,65 @@
 #include <Qt3DExtras/qfirstpersoncameracontroller.h>
 #include <Qt3DExtras/qt3dwindow.h>
 
+void move_object(Qt3DCore::QEntity *e, QVector3D abs_pos) {
+  // Move a qentity (used only for 3d drawing) to a specific position
+  Qt3DCore::QTransform *transform = nullptr;
+  const auto &components = e->components();
+  for (Qt3DCore::QComponent *component : components) {
+    transform = qobject_cast<Qt3DCore::QTransform *>(component);
+    if (transform) {
+      // Successfully found a QTransform component
+      break;
+    }
+  }
+  // Now you can use 'torusTransform' if it is not nullptr
+  if (transform) {
+    // Do something with torusTransform
+    auto curr_translation = transform->translation();
+    transform->setTranslation(abs_pos);
+  } else {
+    qDebug() << "No transform found on entity " << e->id();
+  }
+}
+
+struct Scene3d {
+  // hold a single world's 3d objects for drawing with the 3d frontend
+  QMap<size_t, Qt3DCore::QEntity *> id2ent;
+  void update_pos(World *w, SceneModifier * mod) {
+    for (auto &o : w->objs) {
+      auto id = o->get_id();
+      auto &pos_2d = o->pos;
+      QVector3D pos{pos_2d.x, pos_2d.y, 0};
+      if (!id2ent.contains(id)) {
+        // new up an entity for it
+        switch (o->shape) {
+        case Shape::CIRC:
+          id2ent[id] = new Qt3DCore::QEntity(mod->m_torus);
+          break;
+        case Shape::QUAD:
+          id2ent[id] = new Qt3DCore::QEntity(mod->m_torus);
+          break;
+        case Shape::THREEHAT:
+          id2ent[id] = new Qt3DCore::QEntity(mod->m_sphereEntity);
+          break;
+        case Shape::TRI:
+          id2ent[id] = new Qt3DCore::QEntity(mod->m_coneEntity);
+          break;
+        };
+      }
+      // set 3d position of object
+      move_object(id2ent[id], pos);
+    }
+  }
+};
+
+void main_loop_3d(SceneModifier *modifier, Game *g) {
+  // Update your simulation state here
+  // ...
+  g->active_w = g->worlds[g->active_world_index];
+  Q_ASSERT(g->active_w);
+}
+
 #if TWOD
 // Override base class with your custom functionality
 class UI : public olc::PixelGameEngine {
@@ -316,30 +375,10 @@ int main(int argc, char **argv) {
 
   // Set up a timer for updates
   QTimer timer;
-  QObject::connect(&timer, &QTimer::timeout, [&] {
-    // Update your simulation state here
-    // ...
-    Qt3DCore::QTransform *torusTransform = nullptr;
-
-    const auto &components = modifier->m_torusEntity->components();
-    for (Qt3DCore::QComponent *component : components) {
-      torusTransform = qobject_cast<Qt3DCore::QTransform *>(component);
-      if (torusTransform) {
-        // Successfully found a QTransform component
-        break;
-      }
-    }
-
-    // Now you can use 'torusTransform' if it is not nullptr
-    if (torusTransform) {
-      // Do something with torusTransform
-      auto curr_translation = torusTransform->translation();
-      torusTransform->setTranslation(
-          curr_translation + QVector3D(0.2f, 0.0f, 0.0f)); // Move the cube along the x-axis
-    }
-  });
+  auto main_loop_functor = std::bind(main_loop_3d, modifier, g);
+  QObject::connect(&timer, &QTimer::timeout, main_loop_functor);
   // Start the timer
-  timer.start(1600); // Update every 16 milliseconds (about 60 FPS)
+  timer.start(16); // Update every 16 milliseconds
 
   // Show the Qt3D window
   view->show();
