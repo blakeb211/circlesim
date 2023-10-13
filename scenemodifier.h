@@ -16,12 +16,17 @@
 #include <Qt3DExtras/QPlaneMesh>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DExtras/QPhongMaterial>
+#include "world.h"
 
 class SceneModifier : public QObject
 {
 
 public:
+    QMap<size_t, Qt3DCore::QEntity *> id2ent;
+    void move_object(Qt3DCore::QEntity *e, QVector3D abs_pos);
+    void update_pos(World * w);
     explicit SceneModifier(Qt3DCore::QEntity *rootEntity);
+    Qt3DCore::QEntity * m_rootEntity;
     ~SceneModifier();
 
 public slots:
@@ -32,14 +37,6 @@ public slots:
     void enablePlane(bool enabled);
     void enableSphere(bool enabled);
 
-    Qt3DCore::QEntity *m_rootEntity;
-    Qt3DExtras::QTorusMesh *m_torus;
-    Qt3DCore::QEntity *m_coneEntity;
-    Qt3DCore::QEntity *m_cylinderEntity;
-    Qt3DCore::QEntity *m_torusEntity;
-    Qt3DCore::QEntity *m_cuboidEntity;
-    Qt3DCore::QEntity *m_planeEntity;
-    Qt3DCore::QEntity *m_sphereEntity;
 };
 
 #endif // SCENEMODIFIER_H

@@ -42,11 +42,23 @@
 #include <Qt3DExtras/qfirstpersoncameracontroller.h>
 #include <Qt3DExtras/qt3dwindow.h>
 
-void main_loop_3d(SceneModifier *modifier, Game *g) {
+void main_loop_3d(SceneModifier *modifier, Qt3DRender::QCamera * cam, Game *g) {
   // Update your simulation state here
   // ...
-  g->active_w = g->worlds[g->active_world_index];
+  if (g->active_w != g->worlds[g->active_world_index]) {
+    g->active_w = g->worlds[g->active_world_index];
+    // center cam on current active world
+    auto center2d = QVector2D(g->active_w->dimx() / 2, int(g->active_w->dimx() / 2));
+    cam->setPosition(QVector3D(center2d.x(), center2d.y(), 60.0f));
+    cam->setUpVector(QVector3D(0, 1, 0));
+    cam->setViewCenter(QVector3D(center2d.x(), center2d.y(), 0));
+  }
+
   Q_ASSERT(g->active_w);
+  auto actions = g->update_world(g->active_w, 0.016f);
+  Action::run_actions(actions);
+  modifier->update_pos(g->active_w);
+
 }
 
 #if TWOD
@@ -237,7 +249,7 @@ int main(int argc, char **argv) {
   // Camera
   Qt3DRender::QCamera *cameraEntity = view->camera();
 
-  cameraEntity->lens()->setPerspectiveProjection(65.0f, 16.0f / 9.0f, 0.1f,
+  cameraEntity->lens()->setPerspectiveProjection(55.0f, 10.0f / 10.0f, 0.1f,
                                                  1000.0f);
   cameraEntity->setPosition(QVector3D(0, 0, 20.0f));
   cameraEntity->setUpVector(QVector3D(0, 1, 0));
@@ -301,7 +313,7 @@ int main(int argc, char **argv) {
   vLayout->addWidget(planeCB);
   vLayout->addWidget(sphereCB);
 
-  QObject::connect(torusCB, &QCheckBox::stateChanged, modifier,
+  /* QObject::connect(torusCB, &QCheckBox::stateChanged, modifier,
                    &SceneModifier::enableTorus);
   QObject::connect(coneCB, &QCheckBox::stateChanged, modifier,
                    &SceneModifier::enableCone);
@@ -312,7 +324,7 @@ int main(int argc, char **argv) {
   QObject::connect(planeCB, &QCheckBox::stateChanged, modifier,
                    &SceneModifier::enablePlane);
   QObject::connect(sphereCB, &QCheckBox::stateChanged, modifier,
-                   &SceneModifier::enableSphere);
+                   &SceneModifier::enableSphere); */
 
   torusCB->setChecked(true);
   coneCB->setChecked(true);
@@ -323,7 +335,7 @@ int main(int argc, char **argv) {
 
   // Set up a timer for updates
   QTimer timer;
-  auto main_loop_functor = std::bind(main_loop_3d, modifier, g);
+  auto main_loop_functor = std::bind(main_loop_3d, modifier, cameraEntity, g);
   QObject::connect(&timer, &QTimer::timeout, main_loop_functor);
   // Start the timer
   timer.start(16); // Update every 16 milliseconds
