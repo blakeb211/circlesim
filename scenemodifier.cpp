@@ -20,7 +20,7 @@ Qt3DCore::QEntity* create_and_add_torus(Qt3DCore::QEntity * root) {
     // TorusMesh Transform
     //! [1]
     Qt3DCore::QTransform *torusTransform = new Qt3DCore::QTransform();
-    torusTransform->setScale(2.0f);
+    torusTransform->setScale(0.5f);
     torusTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 25.0f));
     torusTransform->setTranslation(QVector3D(5.0f, 4.0f, 0.0f));
     //! [1]
@@ -52,7 +52,7 @@ Qt3DCore::QEntity * create_and_add_cone(Qt3DCore::QEntity * root) {
 
     // ConeMesh Transform
     Qt3DCore::QTransform *coneTransform = new Qt3DCore::QTransform();
-    coneTransform->setScale(1.5f);
+    coneTransform->setScale(0.5f);
     coneTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f));
     coneTransform->setTranslation(QVector3D(0.0f, 4.0f, -1.5));
 
@@ -79,7 +79,7 @@ Qt3DCore::QEntity * create_and_add_cylinder(Qt3DCore::QEntity * root) {
 
     // CylinderMesh Transform
     Qt3DCore::QTransform *cylinderTransform = new Qt3DCore::QTransform();
-    cylinderTransform->setScale(1.5f);
+    cylinderTransform->setScale(0.5f);
     cylinderTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f));
     cylinderTransform->setTranslation(QVector3D(-5.0f, 4.0f, -1.5));
 
@@ -103,7 +103,7 @@ Qt3DCore::QEntity * create_and_add_cuboid(Qt3DCore::QEntity * root) {
 
     // CuboidMesh Transform
     Qt3DCore::QTransform *cuboidTransform = new Qt3DCore::QTransform();
-    cuboidTransform->setScale(4.0f);
+    cuboidTransform->setScale(0.5f);
     cuboidTransform->setTranslation(QVector3D(5.0f, -4.0f, 0.0f));
 
     Qt3DExtras::QPhongMaterial *cuboidMaterial = new Qt3DExtras::QPhongMaterial();
@@ -127,7 +127,7 @@ Qt3DCore::QEntity * create_and_add_plane(Qt3DCore::QEntity * root) {
 
     // Plane mesh transform
     Qt3DCore::QTransform *planeTransform = new Qt3DCore::QTransform();
-    planeTransform->setScale(1.3f);
+    planeTransform->setScale(2.f);
     planeTransform->setRotation(QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 45.0f));
     planeTransform->setTranslation(QVector3D(0.0f, -4.0f, 0.0f));
 
@@ -156,7 +156,7 @@ Qt3DCore::QEntity * create_and_add_sphere(Qt3DCore::QEntity * root) {
     // Sphere mesh transform
     Qt3DCore::QTransform *sphereTransform = new Qt3DCore::QTransform();
 
-    sphereTransform->setScale(1.3f);
+    sphereTransform->setScale(0.25f);
     sphereTransform->setTranslation(QVector3D(-5.0f, -4.0f, 0.0f));
 
     Qt3DExtras::QPhongMaterial *sphereMaterial = new Qt3DExtras::QPhongMaterial();
