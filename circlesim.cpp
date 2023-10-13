@@ -42,7 +42,7 @@
 #include <Qt3DExtras/qfirstpersoncameracontroller.h>
 #include <Qt3DExtras/qt3dwindow.h>
 
-void main_loop_3d(SceneModifier *modifier, Qt3DRender::QCamera * cam, Game *g) {
+void main_loop_3d(SceneModifier *modifier, QWidget * win, Qt3DRender::QCamera * cam, Game *g) {
   // Update your simulation state here
   // ...
   if (g->active_w != g->worlds[g->active_world_index]) {
@@ -52,6 +52,7 @@ void main_loop_3d(SceneModifier *modifier, Qt3DRender::QCamera * cam, Game *g) {
     cam->setPosition(QVector3D(center2d.x(), center2d.y(), 60.0f));
     cam->setUpVector(QVector3D(0, 1, 0));
     cam->setViewCenter(QVector3D(center2d.x(), center2d.y(), 0));
+    win->setWindowTitle("World: " + QString::number(g->active_world_index));
   }
 
   Q_ASSERT(g->active_w);
@@ -241,7 +242,7 @@ int main(int argc, char **argv) {
   hLayout->addWidget(container, 1);
   hLayout->addLayout(vLayout);
 
-  widget->setWindowTitle(QStringLiteral("Basic shapes"));
+  widget->setWindowTitle(QStringLiteral("3d viewer"));
 
   // Root entity
   Qt3DCore::QEntity *rootEntity = new Qt3DCore::QEntity();
@@ -277,7 +278,7 @@ int main(int argc, char **argv) {
 
   // Create control widgets
   QCommandLinkButton *info = new QCommandLinkButton();
-  info->setText(QStringLiteral("Qt3D ready-made meshes"));
+  info->setText(QStringLiteral("Clickable label"));
   info->setDescription(QString::fromLatin1("World Information"));
   info->setIconSize(QSize(0, 0));
 
@@ -335,7 +336,7 @@ int main(int argc, char **argv) {
 
   // Set up a timer for updates
   QTimer timer;
-  auto main_loop_functor = std::bind(main_loop_3d, modifier, cameraEntity, g);
+  auto main_loop_functor = std::bind(main_loop_3d, modifier, widget, cameraEntity, g);
   QObject::connect(&timer, &QTimer::timeout, main_loop_functor);
   // Start the timer
   timer.start(16); // Update every 16 milliseconds
