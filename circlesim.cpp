@@ -5,7 +5,9 @@
 #endif
 
 #include <QtCore/QTimer>
+#include <QtCore/QEvent>
 #include <QtGui/QGuiApplication>
+#include <QtGui/QKeyEvent>
 
 #include <Qt3DCore/qentity.h>
 #include <Qt3DRender/qcamera.h>
@@ -33,16 +35,16 @@
 
 #include <Qt3DExtras/qforwardrenderer.h>
 #include <Qt3DRender/qrenderaspect.h>
+#include <Qt3DExtras/qfirstpersoncameracontroller.h>
+#include <Qt3DExtras/qt3dwindow.h>
 
 #include "action.h"
 #include "actor.h"
 #include "game.h"
 #include "scenemodifier.h"
 #include "world.h"
-#include <Qt3DExtras/qfirstpersoncameracontroller.h>
-#include <Qt3DExtras/qt3dwindow.h>
 
-void main_loop_3d(SceneModifier *modifier, QWidget * win, Qt3DRender::QCamera * cam, Game *g) {
+void main_loop_3d(SceneModifier *modifier, QWidget * win, Qt3DExtras::Qt3DWindow * view, Qt3DRender::QCamera * cam, Game *g) {
   // Update your simulation state here
   // ...
   if (g->active_w != g->worlds[g->active_world_index]) {
@@ -212,6 +214,33 @@ bool UI::OnUserUpdate(float fElapsedTime) {
   return true;
 }
 #else
+class MyEventFilter : public QObject
+{
+  public:
+  MyEventFilter() = delete;
+  MyEventFilter(Qt3DExtras::Qt3DWindow * w) : targetWidget{w} {}
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override
+    {
+        if (watched == targetWidget) {
+            // Handle events for the target widget here
+            // Hardcoded QEvent::KeyPress as 6 because in X11 it is 2
+            if (event->type() == 6) {
+                QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+                qDebug() << "Key Pressed:" << keyEvent->key();
+                // Handle the key press event
+            }
+            // Add more event handling logic as needed
+        }
+
+        // Continue with the default event processing
+        return QObject::eventFilter(watched, event);
+    }
+
+private:
+    Qt3DExtras::Qt3DWindow *targetWidget;  // Set this to the target widget you want to filter events for
+};
+
 // Three d UI
 #endif
 
@@ -284,35 +313,16 @@ int main(int argc, char **argv) {
 
   QCheckBox *torusCB = new QCheckBox(widget);
   torusCB->setChecked(true);
-  torusCB->setText(QStringLiteral("Torus"));
-
-  QCheckBox *coneCB = new QCheckBox(widget);
-  coneCB->setChecked(true);
-  coneCB->setText(QStringLiteral("Cone"));
-
-  QCheckBox *cylinderCB = new QCheckBox(widget);
-  cylinderCB->setChecked(true);
-  cylinderCB->setText(QStringLiteral("Cylinder"));
-
-  QCheckBox *cuboidCB = new QCheckBox(widget);
-  cuboidCB->setChecked(true);
-  cuboidCB->setText(QStringLiteral("Cuboid"));
+  torusCB->setText(QStringLiteral("Grid"));
 
   QCheckBox *planeCB = new QCheckBox(widget);
   planeCB->setChecked(true);
-  planeCB->setText(QStringLiteral("Plane"));
+  planeCB->setText(QStringLiteral("Pause"));
 
-  QCheckBox *sphereCB = new QCheckBox(widget);
-  sphereCB->setChecked(true);
-  sphereCB->setText(QStringLiteral("Sphere"));
 
   vLayout->addWidget(info);
   vLayout->addWidget(torusCB);
-  vLayout->addWidget(coneCB);
-  vLayout->addWidget(cylinderCB);
-  vLayout->addWidget(cuboidCB);
   vLayout->addWidget(planeCB);
-  vLayout->addWidget(sphereCB);
 
   /* QObject::connect(torusCB, &QCheckBox::stateChanged, modifier,
                    &SceneModifier::enableTorus);
@@ -328,19 +338,19 @@ int main(int argc, char **argv) {
                    &SceneModifier::enableSphere); */
 
   torusCB->setChecked(true);
-  coneCB->setChecked(true);
-  cylinderCB->setChecked(true);
-  cuboidCB->setChecked(true);
   planeCB->setChecked(true);
-  sphereCB->setChecked(true);
 
   // Set up a timer for updates
   QTimer timer;
-  auto main_loop_functor = std::bind(main_loop_3d, modifier, widget, cameraEntity, g);
+  auto main_loop_functor = std::bind(main_loop_3d, modifier, widget, view, cameraEntity, g);
   QObject::connect(&timer, &QTimer::timeout, main_loop_functor);
   // Start the timer
   timer.start(16); // Update every 16 milliseconds
 
+  // Set up input handling
+  MyEventFilter eventFilter(view);
+  view->installEventFilter(&eventFilter);
+   
   // Show the Qt3D window
   view->show();
 
