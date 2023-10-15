@@ -1,6 +1,13 @@
 # 2d game to go inside of larger 3d viewer
-* decouple the game from the PGE so that it can be compiled in either 3d or 2d mode
-* write a 3d ui that interfaces with it 
+* Polish the 3d version
+    * multiple worlds and can move between
+    * render threehats
+    * vary colors and materials
+    * tweak torus rotation
+    * tweak world generation
+        * place walls before actors
+        * thinner walls or select a different default dimension
+* Make it beautiful and post
 
 # high level design
 * add additional classes derived from State to change actor behaviors
@@ -9,6 +16,8 @@
 * update is driven by state if the actor has a state, otherwise the actor update method 
 
 # done
+* decouple the game from the PGE so that it can be compiled in either 3d or 2d mode
+* write a 3d ui that interfaces with it 
 * make WantNeighborsThreeHats jump towards a cluster if its within a certain number of units
 * add a circling state
 * tweak the bsp to be a little more dense on walls
