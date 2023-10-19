@@ -44,40 +44,44 @@
 #include "scenemodifier.h"
 #include "world.h"
 
+// Function to remove all children from an entity
+
+auto removeAllChildren = [](Qt3DCore::QEntity *entity) {
+  auto childrenCopy = entity->children();
+  while (!childrenCopy.isEmpty()) {
+    auto node = childrenCopy.at(0);
+    Qt3DCore::QNode *childNode = qobject_cast<Qt3DCore::QNode *>(node);
+    if (childNode) {
+      entity->childNodes().remove(0);
+      delete childNode;
+    }
+    // Update the local copy for the next iteration
+    childrenCopy = entity->children();
+  }
+};
+
 void main_loop_3d(SceneModifier *modifier, QWidget *win,
                   Qt3DExtras::Qt3DWindow *view, Qt3DRender::QCamera *cam,
                   Game *g) {
   // Update your simulation state here
   // ...
+  UNUSED(removeAllChildren);
   if (g->active_w != g->worlds[g->active_world_index]) {
     assert(g->active_world_index >= 0 &&
            g->active_world_index < g->worlds.size());
     g->active_w = g->worlds[g->active_world_index];
     Qt3DCore::QEntity *rootEntity = modifier->m_rootEntity;
-    // Function to remove all children from an entity
-    auto removeAllChildren = [](Qt3DCore::QEntity *entity) {
-      auto childrenCopy = entity->children();
-      while (!childrenCopy.isEmpty()) {
-        auto node = childrenCopy.at(0);
-        Qt3DCore::QNode *childNode = qobject_cast<Qt3DCore::QNode *>(node);
-        if (childNode) {
-          entity->childNodes().remove(0);
-          delete childNode;
-        }
-        // Update the local copy for the next iteration
-        childrenCopy = entity->children();
-      }
-    };
 
     if (rootEntity) {
       // set view to focus on a different z
-      //view->activeFrameGraph()->parentChanged(view);
+      // view->activeFrameGraph()->parentChanged(view);
     }
 
     // center cam on current active world
     auto center2d =
         QVector2D(g->active_w->dimx() / 2, int(g->active_w->dimx() / 2));
-    cam->setPosition(QVector3D(center2d.x(), center2d.y(), 60.0f - 10.f*g->active_w->id));
+    cam->setPosition(
+        QVector3D(center2d.x(), center2d.y(), 60.0f - 10.f * g->active_w->id));
     cam->setUpVector(QVector3D(0, 1, 0));
     cam->setViewCenter(
         QVector3D(center2d.x(), center2d.y(), g->active_w->id * -10.f));
