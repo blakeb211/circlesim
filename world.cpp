@@ -62,7 +62,12 @@ World::~World() {
   std::cout << "World destructor finished\n";
 }
 
-World::World(size_t dimx) { DIMX = dimx; };
+World::World(size_t dimx) {
+  DIMX = dimx;
+  id = World::counter++;
+};
+
+size_t World::counter{0};
 
 World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
                                       float density, bool inverted) {
@@ -233,7 +238,8 @@ v2 World::direction_nearest(Actor *a, Shape attractor, int radius) {
   // loop through offsets checking Shape and distance
   v2i closest{9999, 9999};
   for (auto _off : pos_to_check) {
-    if (this->occupation.find(pos) != this->occupation.end() && this->occupation[pos].shape == attractor) {
+    if (this->occupation.find(pos) != this->occupation.end() &&
+        this->occupation[pos].shape == attractor) {
       if (_off.norm() < closest.norm()) {
         closest = _off;
       }

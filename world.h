@@ -31,7 +31,9 @@ class World {
   std::vector<CellContext> neighbors_scratch_vec;
   World() = delete;
   World(size_t dimx);
+  static size_t counter;
 public:
+  size_t id;
   friend WorldFactory;
   static CellContext EMPTY_CELL_CONTEXT;
   static void remove_actor_occupancy(Actor const * const a, World * w);
@@ -60,3 +62,4 @@ class WorldFactory {
   static World * create_world_bsp(size_t dim, unsigned int seed, float density, bool inverted);
 
 };
+
