@@ -11,7 +11,7 @@ void Game::init() {
   
   for (int i = 0; i < 8; i++) {
     bool inverted = 1;
-    World *w = WorldFactory::create_world_bsp(64ul, -50+i*70, 250, -100, (unsigned int)i * 2, 0.05f,
+    World *w = WorldFactory::create_world_bsp(64ul, 50+i*70, 250, -100, (unsigned int)i * 2, 0.05f,
                                               inverted);
     this->worlds.push_back(w); // so it can be cleaned up
   }

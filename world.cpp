@@ -62,7 +62,7 @@ World::~World() {
   std::cout << "World destructor finished\n";
 }
 
-World::World(size_t dimx, size_t x, size_t y, size_t z) {
+World::World(size_t dimx, int x, int y, int z) {
   DIMX = dimx;
   id = World::counter++;
   pos3d[0] = x;

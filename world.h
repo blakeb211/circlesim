@@ -30,7 +30,7 @@ class World {
   size_t DIMX;
   std::vector<CellContext> neighbors_scratch_vec;
   World() = delete;
-  World(size_t dimx, size_t x, size_t y, size_t z);
+  World(size_t dimx, int x, int y, int z);
   static size_t counter;
 public:
   int pos3d[3];
