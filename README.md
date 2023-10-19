@@ -1,4 +1,5 @@
 # 2d game to go inside of larger 3d viewer
+* Load all the worlds up front
 * fix cam viewing of world 5
 * make light follow camera
 * Polish the 3d version
