@@ -220,7 +220,7 @@ void SceneModifier::update_pos(World * w) {
           id2ent[id] = create_and_add_cone(m_rootEntity); 
           break;
         };
-        qDebug() << "creating an entity at " << QTime::currentTime();
+        //qDebug() << "creating an entity at " << QTime::currentTime();
       }
       // set 3d position of object
       move_object(id2ent[id], pos);

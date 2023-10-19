@@ -49,6 +49,30 @@ void main_loop_3d(SceneModifier *modifier, QWidget * win, Qt3DExtras::Qt3DWindow
   // ...
   if (g->active_w != g->worlds[g->active_world_index]) {
     g->active_w = g->worlds[g->active_world_index];
+    qDebug() << "Changing world and deleting old objects";
+    Qt3DCore::QEntity *rootEntity = view->findChild<Qt3DCore::QEntity*>();
+    // Function to remove all children from an entity
+    auto removeAllChildren = [](Qt3DCore::QEntity *entity) {
+        auto childrenCopy = entity->children();
+        while (!childrenCopy.isEmpty()) {
+            auto node = childrenCopy.at(0);
+            Qt3DCore::QNode *childNode = qobject_cast<Qt3DCore::QNode*>(node);
+            if (childNode) {
+                entity->childNodes().remove(0);
+                delete childNode;
+            }
+            // Update the local copy for the next iteration
+            childrenCopy = entity->children();
+        }
+    };
+
+
+    if (rootEntity) {
+      // Remove all previous children
+      removeAllChildren(rootEntity);
+      view->activeFrameGraph()->parentChanged(view);
+    }
+
     // center cam on current active world
     auto center2d = QVector2D(g->active_w->dimx() / 2, int(g->active_w->dimx() / 2));
     cam->setPosition(QVector3D(center2d.x(), center2d.y(), 60.0f));
@@ -218,7 +242,7 @@ class MyEventFilter : public QObject
 {
   public:
   MyEventFilter() = delete;
-  MyEventFilter(Qt3DExtras::Qt3DWindow * w) : targetWidget{w} {}
+  MyEventFilter(Qt3DExtras::Qt3DWindow * w, Game * g ) : targetWidget{w}, g{g} {}
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override
     {
@@ -229,6 +253,12 @@ protected:
                 QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
                 qDebug() << "Key Pressed:" << keyEvent->key();
                 // Handle the key press event
+                // @TODO This should be in a signal or wrapped in mutex
+                if (keyEvent->key() == 87) { 
+                  auto new_world = g->active_world_index + 1;
+                  g->active_world_index = (new_world >= g->worlds.size()) ? 0 : new_world; 
+                  qDebug() << "Active world incremented";
+                }
             }
             // Add more event handling logic as needed
         }
@@ -239,6 +269,7 @@ protected:
 
 private:
     Qt3DExtras::Qt3DWindow *targetWidget;  // Set this to the target widget you want to filter events for
+    Game * g;
 };
 
 // Three d UI
@@ -275,7 +306,6 @@ int main(int argc, char **argv) {
 
   // Root entity
   Qt3DCore::QEntity *rootEntity = new Qt3DCore::QEntity();
-
   // Camera
   Qt3DRender::QCamera *cameraEntity = view->camera();
 
@@ -328,17 +358,10 @@ int main(int argc, char **argv) {
                    &SceneModifier::enableTorus);
   QObject::connect(coneCB, &QCheckBox::stateChanged, modifier,
                    &SceneModifier::enableCone);
-  QObject::connect(cylinderCB, &QCheckBox::stateChanged, modifier,
-                   &SceneModifier::enableCylinder);
-  QObject::connect(cuboidCB, &QCheckBox::stateChanged, modifier,
-                   &SceneModifier::enableCuboid);
-  QObject::connect(planeCB, &QCheckBox::stateChanged, modifier,
-                   &SceneModifier::enablePlane);
-  QObject::connect(sphereCB, &QCheckBox::stateChanged, modifier,
-                   &SceneModifier::enableSphere); */
-
   torusCB->setChecked(true);
   planeCB->setChecked(true);
+  */
+
 
   // Set up a timer for updates
   QTimer timer;
@@ -348,7 +371,7 @@ int main(int argc, char **argv) {
   timer.start(16); // Update every 16 milliseconds
 
   // Set up input handling
-  MyEventFilter eventFilter(view);
+  MyEventFilter eventFilter(view, g);
   view->installEventFilter(&eventFilter);
    
   // Show the Qt3D window
