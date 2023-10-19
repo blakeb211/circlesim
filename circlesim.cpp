@@ -78,13 +78,15 @@ void main_loop_3d(SceneModifier *modifier, QWidget *win,
     }
 
     // center cam on current active world
+    auto & wpos = g->active_w->pos3d;
+    auto dimx = g->active_w->dimx();
     auto center2d =
-        QVector2D(g->active_w->dimx() / 2, int(g->active_w->dimx() / 2));
+        QVector2D(wpos[0] + dimx/2, wpos[1] + dimx/2);
     cam->setPosition(
-        QVector3D(center2d.x(), center2d.y(), 60.0f - 10.f * g->active_w->id));
+        QVector3D(center2d.x(), center2d.y(), wpos[2] + 40.f));
     cam->setUpVector(QVector3D(0, 1, 0));
     cam->setViewCenter(
-        QVector3D(center2d.x(), center2d.y(), g->active_w->id * -10.f));
+        QVector3D(center2d.x(), center2d.y(), wpos[2]));
     win->setWindowTitle("World: " + QString::number(g->active_world_index));
   }
 
@@ -259,7 +261,7 @@ protected:
         qDebug() << "Key Pressed:" << keyEvent->key();
         // Handle the key press event
         // @TODO This should be in a signal or wrapped in mutex
-        if (keyEvent->key() == 87) {
+        if (keyEvent->key() == 16777217) {
           auto new_world = g->active_world_index + 1;
           g->active_world_index =
               (new_world >= g->worlds.size()) ? 0 : new_world;
@@ -316,7 +318,7 @@ int main(int argc, char **argv) {
   // Camera
   Qt3DRender::QCamera *cameraEntity = view->camera();
 
-  cameraEntity->lens()->setPerspectiveProjection(55.0f, 10.0f / 10.0f, 0.1f,
+  cameraEntity->lens()->setPerspectiveProjection(65.0f, 10.0f / 10.0f, 0.1f,
                                                  1000.0f);
   cameraEntity->setPosition(QVector3D(0, 0, 20.0f));
   cameraEntity->setUpVector(QVector3D(0, 1, 0));

@@ -62,19 +62,22 @@ World::~World() {
   std::cout << "World destructor finished\n";
 }
 
-World::World(size_t dimx) {
+World::World(size_t dimx, size_t x, size_t y, size_t z) {
   DIMX = dimx;
   id = World::counter++;
+  pos3d[0] = x;
+  pos3d[1] = y;
+  pos3d[2] = z;
 };
 
 size_t World::counter{0};
 
-World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
+World *WorldFactory::create_world_bsp(size_t dimx, int x, int y, int z, unsigned int seed,
                                       float density, bool inverted) {
   // @TODO move world generation to its own header file
   // @TODO make sure initial placement of object is a valid spot
   Matrix walls = gen_world_bsp(dimx, seed, inverted);
-  World *w = new World(dimx);
+  World *w = new World(dimx,x ,y, z);
 
   auto try_add_actor_at_position = [](Actor *a, World *w, v2i offset) {
     if (w->pos_valid_whole_actor(a, offset)) {
@@ -106,8 +109,13 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
         auto actor_pos = v2{float(x), float(y)};
         try_add_actor_at_position(new_obj, w, actor_pos - pre_placement_pos);
 
-      } else { // not a wall position
-
+      } 
+    }
+  }
+  for (int x = 0; x < dimx; x++) {
+    for (int y = 0; y < dimx; y++) {
+       // not a wall position
+        if (walls(x,y) > 0) continue;
         auto density_rand = rint_distr(1, int(1 / density))(generator);
         if (density_rand != 1) {
           continue;
@@ -133,7 +141,6 @@ World *WorldFactory::create_world_bsp(size_t dimx, unsigned int seed,
         try_add_actor_at_position(new_obj, w, actor_pos - pre_placement_pos);
       }
     } // y loop
-  }   // x loop
   return w;
 }
 

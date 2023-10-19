@@ -30,9 +30,10 @@ class World {
   size_t DIMX;
   std::vector<CellContext> neighbors_scratch_vec;
   World() = delete;
-  World(size_t dimx);
+  World(size_t dimx, size_t x, size_t y, size_t z);
   static size_t counter;
 public:
+  int pos3d[3];
   size_t id;
   friend WorldFactory;
   static CellContext EMPTY_CELL_CONTEXT;
@@ -59,7 +60,7 @@ class WorldFactory {
   /// @param seed 
   /// @return 
   public:
-  static World * create_world_bsp(size_t dim, unsigned int seed, float density, bool inverted);
+  static World * create_world_bsp(size_t dim, int x, int y, int z, unsigned int seed, float density, bool inverted);
 
 };
 

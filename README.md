@@ -1,12 +1,9 @@
 # 2d game to go inside of larger 3d viewer
+* fix cam viewing of world 5
+* make light follow camera
 * Polish the 3d version
-    * multiple worlds and can move between
     * render threehats
     * vary colors and materials
-    * tweak torus rotation
-    * tweak world generation
-        * place walls before actors
-        * thinner walls or select a different default dimension
 * Make it beautiful and post
 
 # high level design

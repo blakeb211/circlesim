@@ -10,9 +10,9 @@ Qt3DCore::QEntity *create_and_add_torus(Qt3DCore::QEntity *root) {
   // Torus shape data
   //! [0]
   auto m_torus = new Qt3DExtras::QTorusMesh();
-  m_torus->setRadius(1.0f);
+  m_torus->setRadius(0.75f);
   m_torus->setMinorRadius(0.4f);
-  m_torus->setRings(100);
+  m_torus->setRings(80);
   m_torus->setSlices(20);
   //! [0]
 
@@ -202,7 +202,7 @@ void SceneModifier::update_pos(World *w) {
   for (auto &o : w->objs) {
     auto id = o->get_id();
     auto &pos_2d = o->pos;
-    QVector3D pos{pos_2d.x, pos_2d.y, w->id * -10.f};
+    QVector3D pos{pos_2d.x + float(w->pos3d[0]), pos_2d.y + float(w->pos3d[1]),float(w->pos3d[2])};
     if (!id2ent.contains(id)) {
       // new up an entity for it
       switch (o->shape) {
