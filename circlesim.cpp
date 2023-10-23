@@ -62,7 +62,7 @@ auto removeAllChildren = [](Qt3DCore::QEntity *entity) {
 
 void main_loop_3d(SceneModifier *modifier, QWidget *win,
                   Qt3DExtras::Qt3DWindow *view, Qt3DRender::QCamera *cam,
-                  Game *g) {
+                  Qt3DCore::QEntity *lightEntity, Game *g) {
   // Update your simulation state here
   // ...
   UNUSED(removeAllChildren);
@@ -72,21 +72,31 @@ void main_loop_3d(SceneModifier *modifier, QWidget *win,
     g->active_w = g->worlds[g->active_world_index];
     Qt3DCore::QEntity *rootEntity = modifier->m_rootEntity;
 
-    if (rootEntity) {
-      // set view to focus on a different z
-      // view->activeFrameGraph()->parentChanged(view);
+    // center cam on current active world
+    auto &wpos = g->active_w->pos3d;
+    auto dimx = g->active_w->dimx();
+    auto center2d = QVector2D(wpos[0] + dimx / 2, wpos[1] + dimx / 2);
+    auto camPosition = QVector3D(center2d.x(), center2d.y(), wpos[2] + 40.f);
+    cam->setPosition(camPosition);
+    cam->setUpVector(QVector3D(0, 1, 0));
+    cam->setViewCenter(QVector3D(center2d.x(), center2d.y(), wpos[2]));
+
+    // make light only light the current world
+    Qt3DCore::QTransform *transform{nullptr};
+    auto components = lightEntity->components();
+    for (Qt3DCore::QComponent *component : components) {
+      transform = qobject_cast<Qt3DCore::QTransform *>(component);
+      if (transform) {
+        // Successfully found a QTransform component
+        break;
+      }
+    }
+    if (transform) {
+      transform->setTranslation(camPosition);
+    } else {
+      qDebug() << "No transform found on light entity";
     }
 
-    // center cam on current active world
-    auto & wpos = g->active_w->pos3d;
-    auto dimx = g->active_w->dimx();
-    auto center2d =
-        QVector2D(wpos[0] + dimx/2, wpos[1] + dimx/2);
-    cam->setPosition(
-        QVector3D(center2d.x(), center2d.y(), wpos[2] + 40.f));
-    cam->setUpVector(QVector3D(0, 1, 0));
-    cam->setViewCenter(
-        QVector3D(center2d.x(), center2d.y(), wpos[2]));
     win->setWindowTitle("World: " + QString::number(g->active_world_index));
   }
 
@@ -372,8 +382,8 @@ int main(int argc, char **argv) {
 
   // Set up a timer for updates
   QTimer timer;
-  auto main_loop_functor =
-      std::bind(main_loop_3d, modifier, widget, view, cameraEntity, g);
+  auto main_loop_functor = std::bind(main_loop_3d, modifier, widget, view,
+                                     cameraEntity, lightEntity, g);
   QObject::connect(&timer, &QTimer::timeout, main_loop_functor);
   // Start the timer
   timer.start(16); // Update every 16 milliseconds
