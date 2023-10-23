@@ -1,9 +1,8 @@
 # 2d game to go inside of larger 3d viewer
-* Load all the worlds up front
-* make light follow camera
 * Polish the 3d version
     * render threehats
     * vary colors and materials
+* add intermediate locations for more fluid movement
 * Make it beautiful and post
 
 # high level design
@@ -13,6 +12,8 @@
 * update is driven by state if the actor has a state, otherwise the actor update method 
 
 # done
+* Load all the worlds up front
+* make light follow camera
 * decouple the game from the PGE so that it can be compiled in either 3d or 2d mode
 * write a 3d ui that interfaces with it 
 * make WantNeighborsThreeHats jump towards a cluster if its within a certain number of units
