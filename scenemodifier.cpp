@@ -202,7 +202,7 @@ void SceneModifier::update_pos(World *w) {
   for (auto &o : w->objs) {
     auto id = o->get_id();
     auto &pos_2d = o->pos;
-    QVector3D pos{pos_2d.x + float(w->pos3d[0]), pos_2d.y + float(w->pos3d[1]),float(w->pos3d[2])};
+    QVector3D pos{pos_2d.x + float(w->pos3d[0]), (w->dimx() - 1) - pos_2d.y + float(w->pos3d[1]),float(w->pos3d[2])};
     if (!id2ent.contains(id)) {
       // new up an entity for it
       switch (o->shape) {

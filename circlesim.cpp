@@ -62,7 +62,16 @@ auto removeAllChildren = [](Qt3DCore::QEntity *entity) {
 
 void main_loop_3d(SceneModifier *modifier, QWidget *win,
                   Qt3DExtras::Qt3DWindow *view, Qt3DRender::QCamera *cam,
-                  Qt3DCore::QEntity *lightEntity, Game *g) {
+                  Qt3DCore::QEntity *lightEntity, bool & isFirstFrame, Game *g) {
+  if (isFirstFrame) {
+    auto initial_win_title = win->windowTitle();
+    for(int i = 0; i < g->worlds.size(); i++) {
+      win->setWindowTitle(QString("Loading World: ") + QString::number(i));
+      modifier->update_pos(g->worlds[i]);
+    } 
+    win->setWindowTitle(initial_win_title);
+    isFirstFrame = false;
+  }
   // Update your simulation state here
   // ...
   UNUSED(removeAllChildren);
@@ -70,7 +79,6 @@ void main_loop_3d(SceneModifier *modifier, QWidget *win,
     assert(g->active_world_index >= 0 &&
            g->active_world_index < g->worlds.size());
     g->active_w = g->worlds[g->active_world_index];
-    Qt3DCore::QEntity *rootEntity = modifier->m_rootEntity;
 
     // center cam on current active world
     auto &wpos = g->active_w->pos3d;
@@ -101,7 +109,7 @@ void main_loop_3d(SceneModifier *modifier, QWidget *win,
   }
 
   Q_ASSERT(g->active_w);
-  auto actions = g->update_world(g->active_w, 0.016f);
+  auto actions = g->update_world(g->active_w, 0.008f);
   Action::run_actions(actions);
   modifier->update_pos(g->active_w);
 }
@@ -382,11 +390,12 @@ int main(int argc, char **argv) {
 
   // Set up a timer for updates
   QTimer timer;
+  bool isFirstFrame{true};
   auto main_loop_functor = std::bind(main_loop_3d, modifier, widget, view,
-                                     cameraEntity, lightEntity, g);
+                                     cameraEntity, lightEntity, isFirstFrame, g);
   QObject::connect(&timer, &QTimer::timeout, main_loop_functor);
   // Start the timer
-  timer.start(16); // Update every 16 milliseconds
+  timer.start(8); // Update every 16 milliseconds
 
   // Set up input handling
   MyEventFilter eventFilter(view, g);

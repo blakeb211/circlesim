@@ -33,8 +33,7 @@
 				"-lQt6Widgets",
 				"-lQt63DCore",
 				"-lQt63DRender",
-				"-lQt63DExtras",
-
+				"-lQt63DExtras"
 			],
 			"options": {
 				"cwd": "${fileDirname}"
