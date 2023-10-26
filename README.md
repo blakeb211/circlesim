@@ -25,4 +25,4 @@
 ## Inspiration
 * Inspired by the questions
   * "If I had to write a CAT scan or MRI scan viewer for volumetric data could I do it?"
-  * "Can I abstract a Game object so that multiple UI backends can be hooked up at the same time?"
+  * "Can I abstract a Game object so that multiple renders can be hooked up in the same codebase?"
