@@ -322,6 +322,19 @@ int main(int argc, char **argv) {
   container->setMinimumSize(QSize(200, 100));
   container->setMaximumSize(screenSize);
 
+
+   QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+
+    if (format.renderableType() == QSurfaceFormat::OpenGL)
+    {
+        qDebug() << "OpenGL is being used.";
+    }
+    else
+    {
+        qDebug() << "Unknown rendering backend.";
+    }
+
+  
   QWidget *widget = new QWidget;
   QHBoxLayout *hLayout = new QHBoxLayout(widget);
   QVBoxLayout *vLayout = new QVBoxLayout();
