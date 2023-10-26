@@ -109,7 +109,7 @@ Qt3DCore::QEntity *create_and_add_cuboid(Qt3DCore::QEntity *root) {
   cuboidTransform->setTranslation(QVector3D(5.0f, -4.0f, 0.0f));
 
   Qt3DExtras::QPhongMaterial *cuboidMaterial = new Qt3DExtras::QPhongMaterial();
-  cuboidMaterial->setDiffuse(QColor(QRgb(0x665423)));
+  cuboidMaterial->setDiffuse(QColor(QRgb(0x662423)));
 
   // Cuboid
   {
@@ -161,7 +161,7 @@ Qt3DCore::QEntity *create_and_add_sphere(Qt3DCore::QEntity *root) {
   sphereTransform->setTranslation(QVector3D(-5.0f, -4.0f, 0.0f));
 
   Qt3DExtras::QPhongMaterial *sphereMaterial = new Qt3DExtras::QPhongMaterial();
-  sphereMaterial->setDiffuse(QColor(QRgb(0xa69929)));
+  sphereMaterial->setDiffuse(QColor(QRgb(0xF69329)));
 
   // Sphere
   {
@@ -176,25 +176,31 @@ Qt3DCore::QEntity *create_and_add_sphere(Qt3DCore::QEntity *root) {
 // Modifer adds renderable entities to the 3DWindow (view)'s root entity
 SceneModifier::SceneModifier(Qt3DCore::QEntity *rootEntity)
     : m_rootEntity(rootEntity) {}
-void SceneModifier::move_object(QVector<Qt3DCore::QEntity *e> & v, QVector3D abs_pos) {
+void SceneModifier::move_object(QVector<Qt3DCore::QEntity *> & v, Actor * o, QVector3D abs_pos) {
   // Move a qentity (used only for 3d drawing) to a specific position
   // @TODO: Update this function to move via the list object including the periph parts of the threehats
-  Qt3DCore::QTransform *transform = nullptr;
-  const auto &components = e->components();
-  for (Qt3DCore::QComponent *component : components) {
-
-    transform = qobject_cast<Qt3DCore::QTransform *>(component);
-    if (transform) {
-      // Successfully found a QTransform component
-      break;
+  auto num_parts = v.size(); 
+  for (size_t i = 0; i < num_parts; i++) {
+    Qt3DCore::QTransform *transform = nullptr;
+    const auto &components = v[i]->components();
+    for (Qt3DCore::QComponent *component : components) {
+      transform = qobject_cast<Qt3DCore::QTransform *>(component);
+      if (transform) {
+        // Successfully found a QTransform component
+        break;
+      }
     }
-  }
-  // Now you can use 'torusTransform' if it is not nullptr
-  if (transform) {
-    // Do something with torusTransform
-    transform->setTranslation(abs_pos);
-  } else {
-    qDebug() << "No transform found on entity " << e->id();
+    // Now you can use the transform if it is not nullptr
+    if (transform) {
+      if (i == 0) {
+        transform->setTranslation(abs_pos);
+      } else {
+        // set periph pos
+        transform->setTranslation(abs_pos + QVector3D{o->periph[i-1].x, o->periph[i-1].y, 0});
+      }
+    } else {
+      qDebug() << "No transform found on entity " << v[i]->id();
+    }
   }
 }
 
@@ -221,6 +227,7 @@ void SceneModifier::update_pos(World *w) {
         id2ent[id].push_back(create_and_add_sphere(m_rootEntity));
         // add peripherals
         for (auto & oo : o->periph) {
+          UNUSED(oo);
           id2ent[id].push_back(create_and_add_sphere(m_rootEntity));
         }
         break;
@@ -232,7 +239,7 @@ void SceneModifier::update_pos(World *w) {
       // qDebug() << "creating an entity at " << QTime::currentTime();
     }
     // set 3d position of object
-    move_object(id2ent[id], pos);
+    move_object(id2ent[id], o, pos);
   }
 }
 

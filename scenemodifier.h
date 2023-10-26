@@ -23,7 +23,7 @@ class SceneModifier : public QObject
 
 public:
     QMap<size_t, QVector<Qt3DCore::QEntity *>> id2ent;
-    void move_object(QVector<Qt3DCore::QEntity *e> &, QVector3D abs_pos);
+    void move_object(QVector<Qt3DCore::QEntity *> & v, Actor * o, QVector3D abs_pos);
     void update_pos(World * w);
     explicit SceneModifier(Qt3DCore::QEntity *rootEntity);
     Qt3DCore::QEntity * m_rootEntity;
