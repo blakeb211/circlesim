@@ -1,31 +1,25 @@
-# 2d game to go inside of larger 3d viewer
-* Add quit action to the 3d version
-* Add 3d controls for the 3d version 
-* add intermediate locations for more fluid movement
-* Make it beautiful and post
+# Simulation/Game prototype with 2D and 3D viewers
 
-# high level design
-* add additional classes derived from State to change actor behaviors
-* add additional classes derived from Action for user or ai actions 
-* objects constrained to unit grid
-* update is driven by state if the actor has a state, otherwise the actor update method 
+## Features
+* Each "world" is an indpendently simulated thing
+* Active world can be toggled with a key
+* Change 2d and 3d views with a compile flag
 
-# done
-* render threehats
-* vary colors and materials
-* Load all the worlds up front
-* make light follow camera
-* decouple the game from the PGE so that it can be compiled in either 3d or 2d mode
-* write a 3d ui that interfaces with it 
-* make WantNeighborsThreeHats jump towards a cluster if its within a certain number of units
-* add a circling state
-* tweak the bsp to be a little more dense on walls
-* add multiple worlds with different initializations and toggle active world
-* write world factory
-* create 10 worlds
-* add spatial data structure so we can have states that favor neighbor related behaviors 
-* keep an updated map of position to cell_context (id, type, distance)
-* add rotation to move action; move facing var to a different action 
-* add different sized entities
-* add state-based movement and hero movement
+## Code Notes
+* Game object separate from any particular engine
+* State pattern for each Actor, making addition of new ones relatively easy
+* Command pattern to separate Action creation and execution
+* 2D viewer with One Lone Coder pixel game engine
+* 3D viewer with Qt6::3DExtras
+
+
+## Screenshots
+* Look at [Screenshots folder](./screenshots/) for images and videos
+
+![Shot 1](./screenshots/oct07.png)
+![Shot 2](./screenshots/oct26_2.png)
+
+![Shot 3](./screenshots/sept28.png)
+![Shot 4](./screenshots/oct19.png)
+
 
