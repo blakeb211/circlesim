@@ -27,7 +27,7 @@ Qt3DCore::QEntity *create_and_add_torus(Qt3DCore::QEntity *root) {
 
   //! [2]
   Qt3DExtras::QPhongMaterial *torusMaterial = new Qt3DExtras::QPhongMaterial();
-  torusMaterial->setDiffuse(QColor(QRgb(0xbeb32b)));
+  torusMaterial->setDiffuse(QColor(QRgb(0x1E90FF)));
   //! [2]
   {
     // Torus

@@ -377,7 +377,7 @@ int main(int argc, char **argv) {
 
   // Create control widgets
   QCommandLinkButton *info = new QCommandLinkButton();
-  info->setText(QStringLiteral("Clickable label"));
+  info->setText(QStringLiteral("Settings"));
   info->setDescription(QString::fromLatin1("World Information"));
   info->setIconSize(QSize(0, 0));
 

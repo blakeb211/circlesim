@@ -1,7 +1,6 @@
 # 2d game to go inside of larger 3d viewer
-* Polish the 3d version
-    * render threehats
-    * vary colors and materials
+* Add quit action to the 3d version
+* Add 3d controls for the 3d version 
 * add intermediate locations for more fluid movement
 * Make it beautiful and post
 
@@ -12,6 +11,8 @@
 * update is driven by state if the actor has a state, otherwise the actor update method 
 
 # done
+* render threehats
+* vary colors and materials
 * Load all the worlds up front
 * make light follow camera
 * decouple the game from the PGE so that it can be compiled in either 3d or 2d mode
