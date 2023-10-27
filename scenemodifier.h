@@ -1,4 +1,4 @@
-// Copyright (C) 2014 Klaralvdalens Datakonsult AB (KDAB).
+// ADAPTED FROM: Copyright (C) 2014 Klaralvdalens Datakonsult AB (KDAB).
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 #ifndef SCENEMODIFIER_H

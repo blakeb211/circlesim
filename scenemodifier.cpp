@@ -1,4 +1,4 @@
-// Copyright (C) 2014 Klaralvdalens Datakonsult AB (KDAB).
+// ADAPTED FROM: Copyright (C) 2014 Klaralvdalens Datakonsult AB (KDAB).
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 #include "scenemodifier.h"
@@ -176,10 +176,12 @@ Qt3DCore::QEntity *create_and_add_sphere(Qt3DCore::QEntity *root) {
 // Modifer adds renderable entities to the 3DWindow (view)'s root entity
 SceneModifier::SceneModifier(Qt3DCore::QEntity *rootEntity)
     : m_rootEntity(rootEntity) {}
-void SceneModifier::move_object(QVector<Qt3DCore::QEntity *> & v, Actor * o, QVector3D abs_pos) {
+void SceneModifier::move_object(QVector<Qt3DCore::QEntity *> &v, Actor *o,
+                                QVector3D abs_pos) {
   // Move a qentity (used only for 3d drawing) to a specific position
-  // @TODO: Update this function to move via the list object including the periph parts of the threehats
-  auto num_parts = v.size(); 
+  // @TODO: Update this function to move via the list object including the
+  // periph parts of the threehats
+  auto num_parts = v.size();
   for (size_t i = 0; i < num_parts; i++) {
     Qt3DCore::QTransform *transform = nullptr;
     const auto &components = v[i]->components();
@@ -196,7 +198,8 @@ void SceneModifier::move_object(QVector<Qt3DCore::QEntity *> & v, Actor * o, QVe
         transform->setTranslation(abs_pos);
       } else {
         // set periph pos
-        transform->setTranslation(abs_pos + QVector3D{o->periph[i-1].x, o->periph[i-1].y, 0});
+        transform->setTranslation(
+            abs_pos + QVector3D{o->periph[i - 1].x, o->periph[i - 1].y, 0});
       }
     } else {
       qDebug() << "No transform found on entity " << v[i]->id();
@@ -208,31 +211,33 @@ void SceneModifier::update_pos(World *w) {
   // hold a single world's 3d objects for drawing with the 3d frontend
   for (auto &o : w->objs) {
     auto id = o->get_id();
-    auto &pos_2d = o->pos;                          // flip y to match the 2d engine 
-    QVector3D pos{pos_2d.x + float(w->pos3d[0]), (w->dimx() - 1) - pos_2d.y + float(w->pos3d[1]),float(w->pos3d[2])};
+    auto &pos_2d = o->pos; // flip y to match the 2d engine
+    QVector3D pos{pos_2d.x + float(w->pos3d[0]),
+                  (w->dimx() - 1) - pos_2d.y + float(w->pos3d[1]),
+                  float(w->pos3d[2])};
     if (!id2ent.contains(id)) {
       // new up an entity for it
       switch (o->shape) {
       case Shape::CIRC:
-        id2ent[id] = QVector<Qt3DCore::QEntity*>{};
+        id2ent[id] = QVector<Qt3DCore::QEntity *>{};
         id2ent[id].push_back(create_and_add_torus(m_rootEntity));
         break;
       case Shape::QUAD:
-        id2ent[id] = QVector<Qt3DCore::QEntity*>{};
+        id2ent[id] = QVector<Qt3DCore::QEntity *>{};
         id2ent[id].push_back(create_and_add_cuboid(m_rootEntity));
         break;
       case Shape::THREEHAT:
-        id2ent[id] = QVector<Qt3DCore::QEntity*>{};
+        id2ent[id] = QVector<Qt3DCore::QEntity *>{};
         // add center piece
         id2ent[id].push_back(create_and_add_sphere(m_rootEntity));
         // add peripherals
-        for (auto & oo : o->periph) {
+        for (auto &oo : o->periph) {
           UNUSED(oo);
           id2ent[id].push_back(create_and_add_sphere(m_rootEntity));
         }
         break;
       case Shape::TRI:
-        id2ent[id] = QVector<Qt3DCore::QEntity*>{};
+        id2ent[id] = QVector<Qt3DCore::QEntity *>{};
         id2ent[id].push_back(create_and_add_cone(m_rootEntity));
         break;
       };

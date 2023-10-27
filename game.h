@@ -5,9 +5,8 @@
 class UI;
 struct Game;
 
-
+// Game object used by both engines
 struct Game {
-  // Decouple game from game engine
   World *active_w;
   size_t active_world_index{0};
   std::vector<World *> worlds;

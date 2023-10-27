@@ -8,6 +8,7 @@ bool CellContext::operator!=(const CellContext &c) const {
   return (this->id != c.id) || (this->shape != c.shape);
 }
 
+// Sentinel value
 CellContext World::EMPTY_CELL_CONTEXT = CellContext{-1, Shape::TRI};
 
 /// @brief remove actor segments from each cell it occupies
@@ -72,12 +73,13 @@ World::World(size_t dimx, int x, int y, int z) {
 
 size_t World::counter{0};
 
-World *WorldFactory::create_world_bsp(size_t dimx, int x, int y, int z, unsigned int seed,
-                                      float density, bool inverted) {
-  // @TODO move world generation to its own header file
-  // @TODO make sure initial placement of object is a valid spot
+// Create the internal game objects (Actors) according to the pattern
+// provided by gen_world_bsp
+World *WorldFactory::create_world_bsp(size_t dimx, int x, int y, int z,
+                                      unsigned int seed, float density,
+                                      bool inverted) {
   Matrix walls = gen_world_bsp(dimx, seed, inverted);
-  World *w = new World(dimx,x ,y, z);
+  World *w = new World(dimx, x, y, z);
 
   auto try_add_actor_at_position = [](Actor *a, World *w, v2i offset) {
     if (w->pos_valid_whole_actor(a, offset)) {
@@ -108,39 +110,39 @@ World *WorldFactory::create_world_bsp(size_t dimx, int x, int y, int z, unsigned
                                    new UnmovableWallState{}, Shape::QUAD);
         auto actor_pos = v2{float(x), float(y)};
         try_add_actor_at_position(new_obj, w, actor_pos - pre_placement_pos);
-
-      } 
+      }
     }
   }
   for (int x = 0; x < dimx; x++) {
     for (int y = 0; y < dimx; y++) {
-       // not a wall position
-        if (walls(x,y) > 0) continue;
-        auto density_rand = rint_distr(1, int(1 / density))(generator);
-        if (density_rand != 1) {
-          continue;
-        }
-
-        // do object placement
-        auto dice_roll = rint_distr(0, 6)(generator);
-        Actor *new_obj =
-            dice_roll > 0
-                ? new Actor(pre_placement_pos, ang,
-                            new WantThreeHatNeighborsState{}, Shape::CIRC)
-                : new Actor(pre_placement_pos, ang, new RandomMoveState{},
-                            Shape::THREEHAT);
-
-        // make some of the monoactors circlers
-        auto dice_roll2 = rint_distr(0, 6)(generator);
-        if (new_obj->shape == Shape::CIRC && dice_roll2 == 0) {
-          delete new_obj->state;
-          new_obj->state = new CirclingState{5, x, y};
-        }
-
-        auto actor_pos = v2{float(x), float(y)};
-        try_add_actor_at_position(new_obj, w, actor_pos - pre_placement_pos);
+      // not a wall position
+      if (walls(x, y) > 0)
+        continue;
+      auto density_rand = rint_distr(1, int(1 / density))(generator);
+      if (density_rand != 1) {
+        continue;
       }
-    } // y loop
+
+      // do object placement
+      auto dice_roll = rint_distr(0, 6)(generator);
+      Actor *new_obj =
+          dice_roll > 0
+              ? new Actor(pre_placement_pos, ang,
+                          new WantThreeHatNeighborsState{}, Shape::CIRC)
+              : new Actor(pre_placement_pos, ang, new RandomMoveState{},
+                          Shape::THREEHAT);
+
+      // make some of the monoactors circlers
+      auto dice_roll2 = rint_distr(0, 6)(generator);
+      if (new_obj->shape == Shape::CIRC && dice_roll2 == 0) {
+        delete new_obj->state;
+        new_obj->state = new CirclingState{5, x, y};
+      }
+
+      auto actor_pos = v2{float(x), float(y)};
+      try_add_actor_at_position(new_obj, w, actor_pos - pre_placement_pos);
+    }
+  } // y loop
   return w;
 }
 
@@ -227,6 +229,7 @@ std::vector<CellContext> &World::neighbors_of(Actor *a) {
 }
 
 // Find direction of nearest attractor within given radius
+// @TODO: Buggy
 v2 World::direction_nearest(Actor *a, Shape attractor, int radius) {
   // collect offsets
   auto pos = a->pos;

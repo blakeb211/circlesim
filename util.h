@@ -1,3 +1,4 @@
+// Free helper functions. Many are used from the olc namespace and the qt engine but a few are here.
 #pragma once
 #include "olcPixelGameEngine.h"
 #include <array>

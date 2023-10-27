@@ -2,6 +2,11 @@
 #include "actor.h"
 #include "world.h"
 
+// Actors act according to what state they are in. If they have no state then
+// their own update method is called.
+// There is a little map on each state so that variables can be created
+// ad hoc as entries in the map.
+
 int32_t Actor::actor_count = 0;
 
 auto UnmovableWallState::handle_input() -> State * { return this; }
@@ -36,7 +41,7 @@ auto WantThreeHatNeighborsState::update(Actor *a, World *w, float dt)
     a->neighbors = count_three_hat_neighbors;
 
     if (a->neighbors < 1) {
-      // move in direction of a threehat if within certain radius 
+      // move in direction of a threehat if within certain radius
       v2 move_offset = w->direction_nearest(a, Shape::THREEHAT, 8);
       a->color = olc::DARK_BLUE;
       return new MoveAction(a, w, move_offset);

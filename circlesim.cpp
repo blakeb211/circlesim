@@ -39,13 +39,16 @@
 #include <Qt3DRender/qrenderaspect.h>
 
 #include "action.h"
+//
 #include "actor.h"
+//
 #include "game.h"
+//
 #include "scenemodifier.h"
+//
 #include "world.h"
 
 // Function to remove all children from an entity
-
 auto removeAllChildren = [](Qt3DCore::QEntity *entity) {
   auto childrenCopy = entity->children();
   while (!childrenCopy.isEmpty()) {
@@ -60,20 +63,20 @@ auto removeAllChildren = [](Qt3DCore::QEntity *entity) {
   }
 };
 
+// This is the main loop passed to the QTimer to make the 3D version's main loop
 void main_loop_3d(SceneModifier *modifier, QWidget *win,
                   Qt3DExtras::Qt3DWindow *view, Qt3DRender::QCamera *cam,
-                  Qt3DCore::QEntity *lightEntity, bool & isFirstFrame, Game *g) {
+                  Qt3DCore::QEntity *lightEntity, bool &isFirstFrame, Game *g) {
   if (isFirstFrame) {
     auto initial_win_title = win->windowTitle();
-    for(int i = 0; i < g->worlds.size(); i++) {
+    for (int i = 0; i < g->worlds.size(); i++) {
       win->setWindowTitle(QString("Loading World: ") + QString::number(i));
       modifier->update_pos(g->worlds[i]);
-    } 
+    }
     win->setWindowTitle(initial_win_title);
     isFirstFrame = false;
   }
-  // Update your simulation state here
-  // ...
+  // Update
   UNUSED(removeAllChildren);
   if (g->active_w != g->worlds[g->active_world_index]) {
     assert(g->active_world_index >= 0 &&
@@ -264,6 +267,8 @@ bool UI::OnUserUpdate(float fElapsedTime) {
   return true;
 }
 #else
+
+// QT needs this to handle input events
 class MyEventFilter : public QObject {
 public:
   MyEventFilter() = delete;
@@ -277,8 +282,6 @@ protected:
       if (event->type() == 6) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         qDebug() << "Key Pressed:" << keyEvent->key();
-        // Handle the key press event
-        // @TODO This should be in a signal or wrapped in mutex
         if (keyEvent->key() == 16777217) {
           auto new_world = g->active_world_index + 1;
           g->active_world_index =
@@ -322,19 +325,14 @@ int main(int argc, char **argv) {
   container->setMinimumSize(QSize(200, 100));
   container->setMaximumSize(screenSize);
 
+  QSurfaceFormat format = QSurfaceFormat::defaultFormat();
 
-   QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+  if (format.renderableType() == QSurfaceFormat::OpenGL) {
+    qDebug() << "OpenGL is being used.";
+  } else {
+    qDebug() << "Unknown rendering backend.";
+  }
 
-    if (format.renderableType() == QSurfaceFormat::OpenGL)
-    {
-        qDebug() << "OpenGL is being used.";
-    }
-    else
-    {
-        qDebug() << "Unknown rendering backend.";
-    }
-
-  
   QWidget *widget = new QWidget;
   QHBoxLayout *hLayout = new QHBoxLayout(widget);
   QVBoxLayout *vLayout = new QVBoxLayout();
@@ -345,6 +343,7 @@ int main(int argc, char **argv) {
   widget->setWindowTitle(QStringLiteral("3d viewer"));
 
   // Root entity
+  // Qt3DCore has you add entities to the root entity and then it automatically renders them
   Qt3DCore::QEntity *rootEntity = new Qt3DCore::QEntity();
   // Camera
   Qt3DRender::QCamera *cameraEntity = view->camera();
@@ -393,6 +392,7 @@ int main(int argc, char **argv) {
   vLayout->addWidget(torusCB);
   vLayout->addWidget(planeCB);
 
+  // Used to make the check boxes active
   /* QObject::connect(torusCB, &QCheckBox::stateChanged, modifier,
                    &SceneModifier::enableTorus);
   QObject::connect(coneCB, &QCheckBox::stateChanged, modifier,
@@ -404,8 +404,9 @@ int main(int argc, char **argv) {
   // Set up a timer for updates
   QTimer timer;
   bool isFirstFrame{true};
-  auto main_loop_functor = std::bind(main_loop_3d, modifier, widget, view,
-                                     cameraEntity, lightEntity, isFirstFrame, g);
+  auto main_loop_functor =
+      std::bind(main_loop_3d, modifier, widget, view, cameraEntity, lightEntity,
+                isFirstFrame, g);
   QObject::connect(&timer, &QTimer::timeout, main_loop_functor);
   // Start the timer
   timer.start(8); // Update every 16 milliseconds

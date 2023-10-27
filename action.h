@@ -1,18 +1,18 @@
 #pragma once
 #include "actor.h"
+#include "game.h"
 #include "olcPixelGameEngine.h"
 #include "util.h"
 #include "world.h"
-#include "game.h"
 
 class Actor;
-
+// The object that encapsulates work to be done later
 class Action {
 public:
   virtual ~Action(){};
   virtual void execute() = 0;
   // Execute and free container of action pointers
-  static void run_actions(std::vector<Action*> l) {
+  static void run_actions(std::vector<Action *> l) {
     for (auto &a : l) {
       a->execute();
       delete (a);
@@ -110,12 +110,11 @@ public:
   }
 };
 
-
-
 class QuitAction : public Action {
-  Game * g;
+  Game *g;
+
 public:
   QuitAction() = delete;
-  QuitAction(Game * g) { this->g = g; }
+  QuitAction(Game *g) { this->g = g; }
   void execute() override { g->time_to_cleanup = true; }
 };

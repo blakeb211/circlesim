@@ -55,10 +55,10 @@ public:
 
 
 class WorldFactory {
-  /// @brief 
-  /// @param dim 
-  /// @param seed 
-  /// @return 
+  /// @brief  Factory function for world objects. There is no interaction between worlds, though it could be added.
+  /// @param  dim side length of the 2d dimensions of the worlds, which are squares.
+  /// @param  seed random seed that effects world generation patterns.
+  /// @return owning pointer
   public:
   static World * create_world_bsp(size_t dim, int x, int y, int z, unsigned int seed, float density, bool inverted);
 

@@ -18,10 +18,10 @@ void Game::init() {
 
 }
 
-/// @brief 
-/// @param w 
-/// @param dt 
-/// @return 
+/// @brief  call update method on each actor in the world.
+/// @param  w world pointer
+/// @param  dt frame time in seconds
+/// @return vector of actions to be done later
 auto Game::update_world(World *w, float dt) -> std::vector<Action *> {
   std::vector<Action *> ret;
   for (auto &o : w->objs) {
