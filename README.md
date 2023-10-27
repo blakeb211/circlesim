@@ -22,4 +22,7 @@
 ![Shot 3](./screenshots/sept28.png)
 ![Shot 4](./screenshots/oct19.png)
 
-
+## Inspiration
+* Inspired by the questions
+  * "If I had to write a CAT scan or MRI scan viewer for volumetric data could I do it?"
+  * "Can I abstract a Game object so that multiple renders can be hooked up in the same codebase?"
